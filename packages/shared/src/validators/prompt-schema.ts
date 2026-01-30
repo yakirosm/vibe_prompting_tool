@@ -1,4 +1,5 @@
-import type { PromptGenerationOptions, PromptLength, PromptStrategy, AgentId } from '../types/prompt';
+import type { PromptGenerationOptions, PromptLength, PromptStrategy, BuiltInAgentId } from '../types/prompt';
+import { isCustomAgentId } from '../types/prompt';
 
 export interface ValidationError {
   field: string;
@@ -12,7 +13,7 @@ export interface ValidationResult {
 
 export const VALID_LENGTHS: PromptLength[] = ['short', 'standard', 'detailed'];
 export const VALID_STRATEGIES: PromptStrategy[] = ['implement', 'diagnose'];
-export const VALID_AGENTS: AgentId[] = [
+export const VALID_BUILT_IN_AGENTS: BuiltInAgentId[] = [
   'cursor',
   'lovable',
   'replit',
@@ -25,6 +26,10 @@ export const VALID_AGENTS: AgentId[] = [
   'generic',
   'custom',
 ];
+
+function isValidAgent(agent: string): boolean {
+  return VALID_BUILT_IN_AGENTS.includes(agent as BuiltInAgentId) || isCustomAgentId(agent);
+}
 
 export const INPUT_MAX_LENGTH = 5000;
 export const INPUT_MIN_LENGTH = 10;
@@ -61,7 +66,7 @@ export function validatePromptGenerationOptions(
   // Validate agent
   if (!options.agent) {
     errors.push({ field: 'agent', message: 'Agent is required' });
-  } else if (!VALID_AGENTS.includes(options.agent)) {
+  } else if (!isValidAgent(options.agent)) {
     errors.push({ field: 'agent', message: 'Invalid agent selected' });
   }
 

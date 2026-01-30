@@ -1,7 +1,8 @@
-import type { AgentId } from '../types/prompt';
+import type { BuiltInAgentId } from '../types/prompt';
+import type { CustomAgent } from '../types/custom-agent';
 
 export interface AgentDialect {
-  id: AgentId;
+  id: BuiltInAgentId;
   name: string;
   tone: string;
   structure: string;
@@ -10,7 +11,7 @@ export interface AgentDialect {
   outputFormatNotes?: string;
 }
 
-export const AGENT_DIALECTS: Record<AgentId, AgentDialect> = {
+export const AGENT_DIALECTS: Record<BuiltInAgentId, AgentDialect> = {
   cursor: {
     id: 'cursor',
     name: 'Cursor',
@@ -117,11 +118,11 @@ export const AGENT_OPTIONS = Object.values(AGENT_DIALECTS).map((dialect) => ({
   label: dialect.name,
 }));
 
-export function getAgentDialect(agentId: AgentId): AgentDialect {
+export function getAgentDialect(agentId: BuiltInAgentId): AgentDialect {
   return AGENT_DIALECTS[agentId];
 }
 
-export function getAgentDialectPrompt(agentId: AgentId): string {
+export function getAgentDialectPrompt(agentId: BuiltInAgentId): string {
   const dialect = AGENT_DIALECTS[agentId];
   return `
 AGENT: ${dialect.name}
@@ -131,4 +132,29 @@ AGENT: ${dialect.name}
 - Key instruction: ${dialect.extraPhrase}
 ${dialect.outputFormatNotes ? `- Output notes: ${dialect.outputFormatNotes}` : ''}
 `.trim();
+}
+
+export function getCustomAgentDialectPrompt(agent: CustomAgent): string {
+  const parts: string[] = [`AGENT: ${agent.name} (Custom)`];
+
+  if (agent.tone) {
+    parts.push(`- Tone: ${agent.tone}`);
+  }
+  if (agent.structure_preference) {
+    parts.push(`- Structure preference: ${agent.structure_preference}`);
+  }
+  if (agent.emphasis) {
+    parts.push(`- Emphasis: ${agent.emphasis}`);
+  }
+  if (agent.extra_phrase) {
+    parts.push(`- Key instruction: ${agent.extra_phrase}`);
+  }
+  if (agent.custom_instructions) {
+    parts.push(`- Custom instructions: ${agent.custom_instructions}`);
+  }
+  if (agent.documentation_url) {
+    parts.push(`- Reference documentation: ${agent.documentation_url}`);
+  }
+
+  return parts.join('\n');
 }

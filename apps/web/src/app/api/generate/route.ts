@@ -5,8 +5,11 @@ import { buildMessages, parseGeneratedPrompt } from '@/lib/ai/prompt-builder';
 import {
   type PromptGenerationOptions,
   type AIProviderType,
+  type CustomAgent,
   validatePromptGenerationOptions,
   DEFAULT_MODELS,
+  isCustomAgentId,
+  extractCustomAgentUuid,
 } from '@prompt-ops/shared';
 
 interface UserSettings {
@@ -81,8 +84,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Fetch custom agent if needed
+    let customAgent: CustomAgent | undefined;
+    if (isCustomAgentId(options.agent)) {
+      const customAgentId = extractCustomAgentUuid(options.agent);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: agentData, error: agentError } = await (supabase as any)
+        .from('custom_agents')
+        .select('*')
+        .eq('id', customAgentId)
+        .single();
+
+      if (agentError || !agentData) {
+        return NextResponse.json(
+          { message: 'Custom agent not found' },
+          { status: 404 }
+        );
+      }
+      customAgent = agentData as CustomAgent;
+    }
+
     // Build messages
-    const messages = buildMessages(options, { provider });
+    const messages = buildMessages(options, { provider, customAgent });
 
     // Create AI provider and generate
     const aiProvider = createAIProvider({

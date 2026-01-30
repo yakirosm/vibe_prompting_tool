@@ -1,14 +1,18 @@
 'use client';
 
 import * as React from 'react';
-import { HelpCircle } from 'lucide-react';
+import Link from 'next/link';
+import { HelpCircle, Bot, Settings2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -19,7 +23,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { AGENT_OPTIONS, type PromptLength, type PromptStrategy, type AgentId } from '@prompt-ops/shared';
+import { type PromptLength, type PromptStrategy, type AgentId } from '@prompt-ops/shared';
+import { useAgentOptions } from '@/hooks/use-agent-options';
 import { cn } from '@/lib/utils';
 
 interface OptionsBarProps {
@@ -45,6 +50,12 @@ export function OptionsBar({
   onAskClarifyingQuestionsChange,
   disabled,
 }: OptionsBarProps) {
+  const { allAgentOptions } = useAgentOptions();
+
+  // Separate built-in and custom agents
+  const builtInAgents = allAgentOptions.filter((opt) => !opt.isCustom);
+  const customAgents = allAgentOptions.filter((opt) => opt.isCustom);
+
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-muted/30 transition-colors">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -62,11 +73,40 @@ export function OptionsBar({
               <SelectValue placeholder="Select agent" />
             </SelectTrigger>
             <SelectContent>
-              {AGENT_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
+              <SelectGroup>
+                <SelectLabel>Built-in Agents</SelectLabel>
+                {builtInAgents.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              {customAgents.length > 0 && (
+                <>
+                  <SelectSeparator />
+                  <SelectGroup>
+                    <SelectLabel>Custom Agents</SelectLabel>
+                    {customAgents.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        <div className="flex items-center gap-2">
+                          <Bot className="h-3 w-3 text-primary" />
+                          {option.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </>
+              )}
+              <SelectSeparator />
+              <div className="px-2 py-1.5">
+                <Link
+                  href="/app/agents"
+                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Settings2 className="h-3 w-3" />
+                  Manage Agents
+                </Link>
+              </div>
             </SelectContent>
           </Select>
         </div>

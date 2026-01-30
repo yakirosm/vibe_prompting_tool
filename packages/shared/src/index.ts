@@ -3,6 +3,7 @@ export * from './types/prompt';
 export * from './types/project';
 export * from './types/ai-provider';
 export * from './types/guidelines';
+export * from './types/custom-agent';
 
 // Constants
 export * from './constants/agent-dialects';

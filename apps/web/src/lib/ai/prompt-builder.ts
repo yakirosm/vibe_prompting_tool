@@ -3,6 +3,8 @@ import type {
   GeneratedPrompt,
   AIMessage,
   AIProviderType,
+  CustomAgent,
+  BuiltInAgentId,
 } from '@prompt-ops/shared';
 import {
   CORE_SYSTEM_PROMPT,
@@ -10,12 +12,15 @@ import {
   STRATEGY_INSTRUCTIONS,
   CLARIFYING_QUESTIONS_INSTRUCTION,
   getAgentDialectPrompt,
+  getCustomAgentDialectPrompt,
   lookupGuidelines,
   detectInputLanguage,
+  isCustomAgentId,
 } from '@prompt-ops/shared';
 
 export interface PromptBuilderConfig {
   provider: AIProviderType;
+  customAgent?: CustomAgent;
 }
 
 export function buildSystemPrompt(
@@ -27,14 +32,23 @@ export function buildSystemPrompt(
   // Core system prompt
   parts.push(CORE_SYSTEM_PROMPT);
 
-  // Add guidelines injection
-  const guidelines = lookupGuidelines(config.provider, options.agent);
-  if (guidelines.combinedInjection) {
-    parts.push('\n---\nGUIDELINES:\n' + guidelines.combinedInjection);
+  // Determine if this is a custom agent
+  const isCustom = isCustomAgentId(options.agent);
+
+  // Add guidelines injection (only for built-in agents)
+  if (!isCustom) {
+    const guidelines = lookupGuidelines(config.provider, options.agent as BuiltInAgentId);
+    if (guidelines.combinedInjection) {
+      parts.push('\n---\nGUIDELINES:\n' + guidelines.combinedInjection);
+    }
   }
 
   // Add agent dialect
-  parts.push('\n---\n' + getAgentDialectPrompt(options.agent));
+  if (isCustom && config.customAgent) {
+    parts.push('\n---\n' + getCustomAgentDialectPrompt(config.customAgent));
+  } else if (!isCustom) {
+    parts.push('\n---\n' + getAgentDialectPrompt(options.agent as BuiltInAgentId));
+  }
 
   // Add length instructions
   parts.push('\n---\n' + LENGTH_INSTRUCTIONS[options.length]);

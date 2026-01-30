@@ -1,6 +1,6 @@
 import type { ProviderGuideline, GuidelinesLookupResult, GuidelineProviderId } from '../../types/guidelines';
 import type { AIProviderType } from '../../types/ai-provider';
-import type { AgentId } from '../../types/prompt';
+import type { BuiltInAgentId } from '../../types/prompt';
 import { OPENAI_GUIDELINES } from './openai';
 import { ANTHROPIC_GUIDELINES } from './anthropic';
 import { GOOGLE_GUIDELINES } from './google';
@@ -25,7 +25,7 @@ const PROVIDER_TO_GUIDELINE: Record<AIProviderType, GuidelineProviderId | null> 
   custom: null, // Uses general best practices
 };
 
-const AGENT_TO_GUIDELINE: Record<AgentId, GuidelineProviderId> = {
+const AGENT_TO_GUIDELINE: Record<BuiltInAgentId, GuidelineProviderId> = {
   cursor: 'cursor',
   lovable: 'lovable',
   replit: 'replit',
@@ -41,7 +41,7 @@ const AGENT_TO_GUIDELINE: Record<AgentId, GuidelineProviderId> = {
 
 export function lookupGuidelines(
   provider: AIProviderType,
-  agent: AgentId
+  agent: BuiltInAgentId
 ): GuidelinesLookupResult {
   const providerGuidelineId = PROVIDER_TO_GUIDELINE[provider];
   const agentGuidelineId = AGENT_TO_GUIDELINE[agent];

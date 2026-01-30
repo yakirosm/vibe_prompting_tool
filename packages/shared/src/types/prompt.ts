@@ -60,7 +60,7 @@ export interface GeneratedPrompt {
   fullPrompt: string;
 }
 
-export type AgentId =
+export type BuiltInAgentId =
   | 'cursor'
   | 'lovable'
   | 'replit'
@@ -72,3 +72,15 @@ export type AgentId =
   | 'aider'
   | 'generic'
   | 'custom';
+
+export type CustomAgentId = `custom-${string}`;
+
+export type AgentId = BuiltInAgentId | CustomAgentId;
+
+export function isCustomAgentId(agentId: string): agentId is CustomAgentId {
+  return agentId.startsWith('custom-') && agentId !== 'custom';
+}
+
+export function extractCustomAgentUuid(agentId: CustomAgentId): string {
+  return agentId.replace('custom-', '');
+}
