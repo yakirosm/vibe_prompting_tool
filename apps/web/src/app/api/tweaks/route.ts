@@ -99,10 +99,8 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   if (!isSupabaseConfigured) {
-    return NextResponse.json(
-      { error: 'Database not configured' },
-      { status: 503 }
-    );
+    // Return empty array when database is not configured
+    return NextResponse.json({ tweaks: [], total: 0 });
   }
 
   try {
@@ -112,10 +110,8 @@ export async function GET(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      // Return empty array for unauthenticated users (graceful degradation)
+      return NextResponse.json({ tweaks: [], total: 0 });
     }
 
     const { searchParams } = new URL(request.url);
