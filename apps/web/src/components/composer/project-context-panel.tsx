@@ -12,7 +12,6 @@ import {
   Check,
   Sparkles,
   FolderPlus,
-  ExternalLink,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
@@ -413,12 +412,12 @@ export function ProjectContextPanel({
               ) : (
                 <Link href="/app/projects">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="gap-1.5 text-muted-foreground"
+                    className="gap-1.5"
                   >
-                    <ExternalLink className="h-3 w-3" />
-                    Manage Projects
+                    <FolderPlus className="h-3.5 w-3.5" />
+                    Create Project
                   </Button>
                 </Link>
               )}
