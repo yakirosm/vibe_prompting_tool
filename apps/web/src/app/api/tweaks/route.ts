@@ -140,19 +140,15 @@ export async function GET(request: NextRequest) {
       .order('updated_at', { ascending: false });
 
     if (error) {
+      // If table doesn't exist or other DB error, return empty array gracefully
       console.error('Failed to fetch custom tweaks:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch custom tweaks' },
-        { status: 500 }
-      );
+      return NextResponse.json({ tweaks: [], total: 0 });
     }
 
     return NextResponse.json({ tweaks: data, total: count });
   } catch (error) {
+    // Handle any unexpected errors gracefully
     console.error('Error fetching custom tweaks:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ tweaks: [], total: 0 });
   }
 }
