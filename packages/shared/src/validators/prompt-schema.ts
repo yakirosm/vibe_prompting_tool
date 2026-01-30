@@ -1,5 +1,8 @@
-import type { PromptGenerationOptions, PromptLength, PromptStrategy, BuiltInAgentId } from '../types/prompt';
+import type { PromptGenerationOptions, PromptLength, PromptStrategy, BuiltInAgentId, SelectedTweaks } from '../types/prompt';
 import { isCustomAgentId } from '../types/prompt';
+import type { ThinkingLevel } from '../types/tweaks';
+import { ALL_TWEAKS, THINKING_LEVELS, getTweakById } from '../constants/tweaks';
+import { tweaksConflict } from '../utils/tweak-suggestions';
 
 export interface ValidationError {
   field: string;
@@ -82,6 +85,63 @@ export function validatePromptGenerationOptions(
     errors.push({ field: 'strategy', message: 'Strategy is required' });
   } else if (!VALID_STRATEGIES.includes(options.strategy)) {
     errors.push({ field: 'strategy', message: 'Invalid strategy selected' });
+  }
+
+  // Validate tweaks if provided
+  if (options.tweaks) {
+    const tweaksValidation = validateSelectedTweaks(options.tweaks);
+    errors.push(...tweaksValidation.errors);
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+export function validateSelectedTweaks(tweaks: SelectedTweaks): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  // Validate skill tweaks
+  if (tweaks.skills && tweaks.skills.length > 0) {
+    for (const skillId of tweaks.skills) {
+      const tweak = getTweakById(skillId);
+      if (!tweak) {
+        errors.push({ field: 'tweaks.skills', message: `Invalid skill tweak: ${skillId}` });
+      } else if (tweak.category !== 'skill') {
+        errors.push({ field: 'tweaks.skills', message: `${skillId} is not a skill tweak` });
+      }
+    }
+  }
+
+  // Validate thinking mode
+  if (tweaks.thinking) {
+    if (!THINKING_LEVELS.includes(tweaks.thinking as ThinkingLevel)) {
+      errors.push({ field: 'tweaks.thinking', message: `Invalid thinking mode: ${tweaks.thinking}` });
+    }
+  }
+
+  // Validate behavior tweaks
+  if (tweaks.behaviors && tweaks.behaviors.length > 0) {
+    for (const behaviorId of tweaks.behaviors) {
+      const tweak = getTweakById(behaviorId);
+      if (!tweak) {
+        errors.push({ field: 'tweaks.behaviors', message: `Invalid behavior tweak: ${behaviorId}` });
+      } else if (tweak.category !== 'behavior') {
+        errors.push({ field: 'tweaks.behaviors', message: `${behaviorId} is not a behavior tweak` });
+      }
+    }
+
+    // Check for conflicts between behaviors
+    for (let i = 0; i < tweaks.behaviors.length; i++) {
+      for (let j = i + 1; j < tweaks.behaviors.length; j++) {
+        if (tweaksConflict(tweaks.behaviors[i], tweaks.behaviors[j])) {
+          const tweakA = getTweakById(tweaks.behaviors[i]);
+          const tweakB = getTweakById(tweaks.behaviors[j]);
+          errors.push({
+            field: 'tweaks.behaviors',
+            message: `Conflicting behaviors: "${tweakA?.label}" and "${tweakB?.label}"`,
+          });
+        }
+      }
+    }
   }
 
   return { valid: errors.length === 0, errors };

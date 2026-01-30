@@ -6,6 +6,7 @@ import {
   type PromptGenerationOptions,
   type AIProviderType,
   type CustomAgent,
+  type SelectedTweaks,
   validatePromptGenerationOptions,
   DEFAULT_MODELS,
   isCustomAgentId,
@@ -21,6 +22,17 @@ interface UserSettings {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
+    // Parse tweaks if provided
+    let tweaks: SelectedTweaks | undefined;
+    if (body.tweaks) {
+      tweaks = {
+        skills: body.tweaks.skills || [],
+        thinking: body.tweaks.thinking,
+        behaviors: body.tweaks.behaviors || [],
+      };
+    }
+
     const options: PromptGenerationOptions = {
       input: body.input,
       agent: body.agent,
@@ -28,6 +40,7 @@ export async function POST(request: NextRequest) {
       strategy: body.strategy,
       askClarifyingQuestions: body.askClarifyingQuestions ?? false,
       projectContext: body.projectContext,
+      tweaks,
     };
 
     // Validate input

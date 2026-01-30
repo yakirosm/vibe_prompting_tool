@@ -47,7 +47,12 @@ export interface PromptGenerationOptions {
   strategy: PromptStrategy;
   askClarifyingQuestions: boolean;
   projectContext?: string;
+  tweaks?: SelectedTweaks;
 }
+
+// Re-export from tweaks for convenience
+import type { SelectedTweaks } from './tweaks';
+export type { SelectedTweaks };
 
 export interface GeneratedPrompt {
   goal: string;

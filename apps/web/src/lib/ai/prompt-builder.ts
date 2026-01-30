@@ -5,6 +5,7 @@ import type {
   AIProviderType,
   CustomAgent,
   BuiltInAgentId,
+  SelectedTweaks,
 } from '@prompt-ops/shared';
 import {
   CORE_SYSTEM_PROMPT,
@@ -16,11 +17,54 @@ import {
   lookupGuidelines,
   detectInputLanguage,
   isCustomAgentId,
+  getTweakById,
+  THINKING_TWEAKS,
 } from '@prompt-ops/shared';
 
 export interface PromptBuilderConfig {
   provider: AIProviderType;
   customAgent?: CustomAgent;
+}
+
+/**
+ * Build instruction block from selected tweaks
+ */
+export function buildTweakInstructions(tweaks?: SelectedTweaks): string | null {
+  if (!tweaks) return null;
+
+  const parts: string[] = [];
+
+  // Add thinking mode instruction (single)
+  if (tweaks.thinking) {
+    const thinkingTweak = THINKING_TWEAKS.find((t) => t.id === tweaks.thinking);
+    if (thinkingTweak) {
+      parts.push(thinkingTweak.instruction);
+    }
+  }
+
+  // Add skill instructions (multiple)
+  if (tweaks.skills && tweaks.skills.length > 0) {
+    for (const skillId of tweaks.skills) {
+      const tweak = getTweakById(skillId);
+      if (tweak && tweak.category === 'skill') {
+        parts.push(tweak.instruction);
+      }
+    }
+  }
+
+  // Add behavior instructions (multiple)
+  if (tweaks.behaviors && tweaks.behaviors.length > 0) {
+    for (const behaviorId of tweaks.behaviors) {
+      const tweak = getTweakById(behaviorId);
+      if (tweak && tweak.category === 'behavior') {
+        parts.push(tweak.instruction);
+      }
+    }
+  }
+
+  if (parts.length === 0) return null;
+
+  return 'ACTIVE TWEAKS:\n' + parts.join('\n\n');
 }
 
 export function buildSystemPrompt(
@@ -59,6 +103,12 @@ export function buildSystemPrompt(
   // Add clarifying questions instruction if enabled
   if (options.askClarifyingQuestions) {
     parts.push('\n---\n' + CLARIFYING_QUESTIONS_INSTRUCTION);
+  }
+
+  // Add tweaks instructions if any are selected
+  const tweakInstructions = buildTweakInstructions(options.tweaks);
+  if (tweakInstructions) {
+    parts.push('\n---\n' + tweakInstructions);
   }
 
   // Add project context if available

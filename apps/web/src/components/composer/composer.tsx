@@ -11,16 +11,22 @@ import { OptionsBar } from './options-bar';
 import { OutputPanel } from './output-panel';
 import { LinterHints } from './linter-hints';
 import { ProjectContextPanel } from './project-context-panel';
+import { TweaksSelector } from './tweaks-selector';
 import {
   type PromptLength,
   type PromptStrategy,
   type AgentId,
+  type BuiltInAgentId,
   type GeneratedPrompt,
   type LinterSuggestion,
   type InputLanguage,
+  type SelectedTweaks,
+  type TweakSuggestion,
   lintPromptInput,
   validatePromptInput,
   detectInputLanguage,
+  suggestTweaks,
+  isCustomAgentId,
 } from '@prompt-ops/shared';
 
 // Discovery prompt for new users
@@ -56,6 +62,11 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
   const [strategy, setStrategy] = React.useState<PromptStrategy>('implement');
   const [askClarifyingQuestions, setAskClarifyingQuestions] = React.useState(false);
   const [projectContext, setProjectContext] = React.useState('');
+  const [selectedTweaks, setSelectedTweaks] = React.useState<SelectedTweaks>({
+    skills: [],
+    thinking: undefined,
+    behaviors: [],
+  });
 
   // Output state
   const [output, setOutput] = React.useState<GeneratedPrompt | null>(null);
@@ -77,6 +88,13 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
     return detectInputLanguage(input);
   }, [input]);
   const isRTL = detectedLanguage === 'he';
+
+  // Compute tweak suggestions based on input
+  const tweakSuggestions = React.useMemo<TweakSuggestion[]>(() => {
+    if (!input || input.length < 20) return [];
+    const currentAgent = isCustomAgentId(agent) ? undefined : (agent as BuiltInAgentId);
+    return suggestTweaks({ input, currentAgent });
+  }, [input, agent]);
 
   // Hide welcome when user starts typing
   React.useEffect(() => {
@@ -101,13 +119,13 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
       if (input.length > 0) {
         localStorage.setItem(
           'prompt-ops-draft',
-          JSON.stringify({ input, agent, length, strategy, askClarifyingQuestions })
+          JSON.stringify({ input, agent, length, strategy, askClarifyingQuestions, selectedTweaks })
         );
       }
     }, 10000);
 
     return () => clearTimeout(saveTimer);
-  }, [input, agent, length, strategy, askClarifyingQuestions]);
+  }, [input, agent, length, strategy, askClarifyingQuestions, selectedTweaks]);
 
   // Load draft on mount
   React.useEffect(() => {
@@ -121,6 +139,13 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
         if (parsed.strategy) setStrategy(parsed.strategy);
         if (parsed.askClarifyingQuestions !== undefined) {
           setAskClarifyingQuestions(parsed.askClarifyingQuestions);
+        }
+        if (parsed.selectedTweaks) {
+          setSelectedTweaks({
+            skills: parsed.selectedTweaks.skills || [],
+            thinking: parsed.selectedTweaks.thinking,
+            behaviors: parsed.selectedTweaks.behaviors || [],
+          });
         }
       } catch {
         // Ignore parse errors
@@ -140,6 +165,12 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
     setOutput(null);
 
     try {
+      // Only include tweaks if any are selected
+      const hasTweaks =
+        selectedTweaks.skills.length > 0 ||
+        selectedTweaks.thinking ||
+        selectedTweaks.behaviors.length > 0;
+
       const response = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -150,6 +181,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
           strategy,
           askClarifyingQuestions,
           projectContext: projectContext.trim() || undefined,
+          tweaks: hasTweaks ? selectedTweaks : undefined,
         }),
       });
 
@@ -167,7 +199,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [input, agent, length, strategy, askClarifyingQuestions]);
+  }, [input, agent, length, strategy, askClarifyingQuestions, projectContext, selectedTweaks]);
 
   const handleRegenerate = React.useCallback(() => {
     handleGenerate();
@@ -354,6 +386,13 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
         onLengthChange={setLength}
         onStrategyChange={setStrategy}
         onAskClarifyingQuestionsChange={setAskClarifyingQuestions}
+        disabled={isLoading}
+      />
+
+      <TweaksSelector
+        selectedTweaks={selectedTweaks}
+        suggestions={tweakSuggestions}
+        onTweaksChange={setSelectedTweaks}
         disabled={isLoading}
       />
 
