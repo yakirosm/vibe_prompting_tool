@@ -241,9 +241,9 @@ export function ProjectContextPanel({
             )}
             <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
               {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
                 <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronUp className="h-4 w-4" />
               )}
             </Button>
           </div>
