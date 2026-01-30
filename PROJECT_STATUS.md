@@ -3,14 +3,13 @@
 **Last Updated:** January 30, 2026
 **Status:** Extended MVP - Major Features Implemented
 
-> **Latest Session (Jan 30, 2026):**
-> - Added logout button to header with user dropdown menu
-> - Fixed "Ask clarifying questions" toggle to be more explicit
-> - Implemented RTL panel swap for Hebrew input (Hebrew on right, output on left)
-> - Added 7 new target agents: Claude Code, Windsurf, Bolt, v0, Aider, Generic, Custom
-> - Created Prompt Library page (/app/library) with search, filter, favorites
-> - Created Project Management system (list, detail, CRUD)
-> - Added database migration for tags and custom agents
+> **Latest Session (Jan 30, 2026 - Evening):**
+> - Implemented Custom Agents feature with full CRUD capabilities
+> - Created /app/agents page with search, grid/list views
+> - Added AgentCard and AgentFormDialog UI components
+> - Integrated custom agents into Target Agent dropdown
+> - Updated prompt builder for custom agent dialect generation
+> - Added database migration 003 for custom_agents extension
 
 ---
 
@@ -53,14 +52,15 @@
 | **Logout button** | ✅ **NEW** |
 | **RTL panel swap** | ✅ **NEW** |
 | **Extended agents (11 total)** | ✅ **NEW** |
-| **Prompt Library (/app/library)** | ✅ **NEW** |
-| **Project Management** | ✅ **NEW** |
-| **Database migration v2** | ✅ **NEW** |
+| **Prompt Library (/app/library)** | ✅ Complete |
+| **Project Management** | ✅ Complete |
+| **Database migration v2** | ✅ Complete |
+| **Custom Agents (/app/agents)** | ✅ **NEW** |
+| **Database migration v3** | ✅ **NEW** |
 
 ### Not Yet Implemented
 
 - Tag management UI (API ready)
-- Custom Agent Builder UI (schema ready)
 - Project Discovery features
 - Smart Form mode
 - Wizard mode
@@ -98,7 +98,7 @@ A Next.js 15 application with:
 | v0 | UI-focused, component-driven |
 | Aider | Git-aware, diff-focused |
 | Generic | Neutral, any AI tool |
-| Custom | User-defined (coming soon) |
+| Custom | User-defined agents (/app/agents) |
 
 ### 3. Prompt Library Features
 
@@ -117,7 +117,16 @@ A Next.js 15 application with:
 - **Development Log** - Track progress and changes
 - **Project Settings** - Default agent, mode, tech stack
 
-### 5. RTL Support
+### 5. Custom Agents (`/app/agents`)
+
+- **Agent List** - Card/list view with search
+- **Create Agent** - Name, description, icon, tone, emphasis
+- **Agent Configuration** - Structure preference, key phrase, custom instructions
+- **Documentation URL** - Reference docs for the agent
+- **Dropdown Integration** - Custom agents appear in Target Agent selector
+- **Prompt Generation** - Custom dialect applied during generation
+
+### 6. RTL Support
 
 - Hebrew input automatically detected
 - Panels swap: Hebrew input on RIGHT, output on LEFT
@@ -140,17 +149,21 @@ prompt-ops-copilot/
 │       │   │   │   ├── page.tsx      # Composer
 │       │   │   │   ├── library/      # Prompt Library
 │       │   │   │   ├── projects/     # Project Management
+│       │   │   │   ├── agents/       # Custom Agents (NEW)
 │       │   │   │   └── settings/     # Settings
 │       │   │   └── api/
 │       │   │       ├── generate/     # AI generation
 │       │   │       ├── prompts/      # Prompt CRUD
-│       │   │       └── projects/     # Project CRUD
+│       │   │       ├── projects/     # Project CRUD
+│       │   │       └── agents/       # Custom Agents CRUD (NEW)
 │       │   ├── components/
 │       │   │   ├── ui/               # shadcn/ui components
 │       │   │   ├── composer/         # Composer components
 │       │   │   ├── library/          # Library components
 │       │   │   ├── projects/         # Project components
+│       │   │   ├── agents/           # Agent components (NEW)
 │       │   │   └── layout/           # Header, etc.
+│       │   ├── hooks/                # Custom hooks (NEW)
 │       │   └── lib/
 │       │       ├── ai/               # AI provider logic
 │       │       └── supabase/         # Supabase clients
@@ -168,7 +181,8 @@ prompt-ops-copilot/
 ├── supabase/
 │   └── migrations/
 │       ├── 001_initial_schema.sql    # Core tables
-│       └── 002_extended_features.sql # Tags, custom agents
+│       ├── 002_extended_features.sql # Tags, custom agents
+│       └── 003_custom_agents_extension.sql # Custom agents UI (NEW)
 │
 └── PROJECT_STATUS.md                 # This file
 ```
@@ -267,10 +281,11 @@ ANTHROPIC_API_KEY=sk-ant-your-anthropic-key
 
 ### Apply Migrations
 
-Run both migrations in Supabase SQL Editor:
+Run all migrations in Supabase SQL Editor:
 
 1. `supabase/migrations/001_initial_schema.sql` - Core tables
 2. `supabase/migrations/002_extended_features.sql` - Extended features
+3. `supabase/migrations/003_custom_agents_extension.sql` - Custom agents UI fields
 
 ### Tables Overview
 
@@ -292,13 +307,12 @@ Run both migrations in Supabase SQL Editor:
 ### Immediate Priorities
 
 1. **Tag Management UI** - Create/edit/delete tags, apply to prompts
-2. **Custom Agent Builder** - UI for creating custom agents
-3. **Project Discovery** - Initial prompt + response parser
+2. **Project Discovery** - Initial prompt + response parser
+3. **Project Selector** - Select project in composer for context injection
 
 ### Phase 2 (Remaining)
 
 - [ ] Tag management UI with color picker
-- [ ] Custom Agent Builder dialog
 - [ ] Project Discovery prompt copy
 - [ ] Agent response parser for auto-fill
 - [ ] Enable Smart Form mode
@@ -349,52 +363,50 @@ pnpm build
 | `apps/web/src/components/composer/composer.tsx` | Main composer with RTL |
 | `apps/web/src/app/app/library/page.tsx` | Prompt Library page |
 | `apps/web/src/app/app/projects/page.tsx` | Projects list page |
-| `apps/web/src/components/layout/header.tsx` | Header with logout |
+| `apps/web/src/app/app/agents/page.tsx` | Custom Agents page (NEW) |
+| `apps/web/src/components/agents/agent-card.tsx` | Agent card component (NEW) |
+| `apps/web/src/hooks/use-agent-options.ts` | Agent options hook (NEW) |
+| `apps/web/src/components/layout/header.tsx` | Header with navigation |
 | `packages/shared/src/constants/agent-dialects.ts` | Agent definitions |
-| `supabase/migrations/002_extended_features.sql` | New DB schema |
+| `packages/shared/src/types/custom-agent.ts` | Custom agent types (NEW) |
 
 ---
 
-## Session Summary (Jan 30, 2026)
+## Session Summary (Jan 30, 2026 - Evening)
 
 ### Completed This Session
 
-- [x] Added logout button to header with user dropdown
-- [x] Fixed "Ask clarifying questions" toggle instruction
-- [x] Implemented RTL panel swap for Hebrew input
-- [x] Added 7 new target agents (11 total)
-- [x] Created Prompt Library page with full functionality
-- [x] Created Project Management (list, detail, CRUD)
-- [x] Created database migration for tags and custom agents
-- [x] Added navigation links in header (Library, Projects)
+- [x] Implemented Custom Agents feature with full CRUD
+- [x] Created /app/agents page with search, grid/list views
+- [x] Added AgentCard and AgentFormDialog UI components
+- [x] Created useAgentOptions hook for dropdown integration
+- [x] Integrated custom agents into Target Agent dropdown
+- [x] Updated prompt builder for custom agent dialect
+- [x] Added database migration 003 for custom_agents extension
+- [x] Added Agents navigation link to header
 
 ### Files Created/Modified
 
 **New Files:**
-- `apps/web/src/components/ui/dropdown-menu.tsx`
-- `apps/web/src/components/ui/alert-dialog.tsx`
-- `apps/web/src/components/library/prompt-card.tsx`
-- `apps/web/src/components/library/library-filters.tsx`
-- `apps/web/src/components/projects/project-card.tsx`
-- `apps/web/src/components/projects/project-form-dialog.tsx`
-- `apps/web/src/app/app/library/page.tsx`
-- `apps/web/src/app/app/projects/page.tsx`
-- `apps/web/src/app/app/projects/[id]/page.tsx`
-- `apps/web/src/app/api/prompts/[id]/route.ts`
-- `apps/web/src/app/api/projects/route.ts`
-- `apps/web/src/app/api/projects/[id]/route.ts`
-- `supabase/migrations/002_extended_features.sql`
+- `supabase/migrations/003_custom_agents_extension.sql`
+- `packages/shared/src/types/custom-agent.ts`
+- `apps/web/src/app/api/agents/route.ts`
+- `apps/web/src/app/api/agents/[id]/route.ts`
+- `apps/web/src/app/app/agents/page.tsx`
+- `apps/web/src/components/agents/agent-card.tsx`
+- `apps/web/src/components/agents/agent-form-dialog.tsx`
+- `apps/web/src/hooks/use-agent-options.ts`
 
 **Modified Files:**
-- `apps/web/src/components/layout/header.tsx`
-- `apps/web/src/components/composer/composer.tsx`
-- `apps/web/src/components/composer/input-panel.tsx`
-- `apps/web/src/app/api/prompts/route.ts`
-- `packages/shared/src/types/prompt.ts`
-- `packages/shared/src/constants/agent-dialects.ts`
-- `packages/shared/src/constants/prompt-templates.ts`
-- `packages/shared/src/validators/prompt-schema.ts`
-- `packages/shared/src/constants/provider-guidelines/lookup.ts`
+- `packages/shared/src/types/prompt.ts` - Added BuiltInAgentId, CustomAgentId types
+- `packages/shared/src/constants/agent-dialects.ts` - Added getCustomAgentDialectPrompt()
+- `packages/shared/src/constants/provider-guidelines/lookup.ts` - Updated for BuiltInAgentId
+- `packages/shared/src/validators/prompt-schema.ts` - Support custom agent validation
+- `packages/shared/src/index.ts` - Export new types
+- `apps/web/src/components/composer/options-bar.tsx` - Custom agents in dropdown
+- `apps/web/src/components/layout/header.tsx` - Added Agents nav link
+- `apps/web/src/lib/ai/prompt-builder.ts` - Custom agent dialect support
+- `apps/web/src/app/api/generate/route.ts` - Fetch custom agent for generation
 
 ---
 
