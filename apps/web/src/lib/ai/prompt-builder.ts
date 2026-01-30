@@ -298,9 +298,8 @@ export function formatPromptForCopy(prompt: GeneratedPrompt): string {
     sections.push(`**Constraints:**\n${prompt.constraints.map((c) => `- ${c}`).join('\n')}`);
   }
 
-  if (prompt.clarifyingQuestions && prompt.clarifyingQuestions.length > 0) {
-    sections.push(`**Questions:**\n${prompt.clarifyingQuestions.map((q) => `- ${q}`).join('\n')}`);
-  }
+  // Note: clarifyingQuestions are intentionally excluded from copy
+  // They are for user reference only, not part of the final prompt
 
   return sections.join('\n\n');
 }
