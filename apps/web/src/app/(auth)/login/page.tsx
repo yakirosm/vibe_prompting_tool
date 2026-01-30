@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Spinner } from '@/components/ui/spinner';
 import { createClient } from '@/lib/supabase/client';
 
 function LoginForm() {
@@ -154,7 +155,7 @@ export default function LoginPage() {
         fallback={
           <Card className="w-full max-w-md">
             <CardContent className="flex items-center justify-center py-12">
-              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+              <Spinner size="lg" variant="primary" />
             </CardContent>
           </Card>
         }

@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
-import { Plus, Loader2, Sparkles, Search, LayoutGrid, List } from 'lucide-react';
+import { Plus, Sparkles, Search, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
 import { TweakCard } from '@/components/tweaks/tweak-card';
@@ -136,7 +137,7 @@ export default function TweaksPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Spinner size="lg" variant="muted" />
         </div>
       ) : tweaks.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">

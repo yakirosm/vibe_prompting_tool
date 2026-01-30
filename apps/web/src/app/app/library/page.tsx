@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
-import { Loader2, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { PromptCard } from '@/components/library/prompt-card';
+import { Spinner } from '@/components/ui/spinner';
 import {
   LibraryFiltersBar,
   type LibraryFilters,
@@ -156,7 +157,7 @@ export default function LibraryPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <Spinner size="lg" variant="muted" />
         </div>
       ) : prompts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
