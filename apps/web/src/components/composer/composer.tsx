@@ -90,6 +90,13 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
   }, [input]);
   const isRTL = detectedLanguage === 'he';
 
+  // Platform detection for keyboard shortcut display
+  const [isMac, setIsMac] = React.useState(true); // Default to Mac symbol
+  React.useEffect(() => {
+    setIsMac(navigator.platform?.toLowerCase().includes('mac') ?? false);
+  }, []);
+  const modifierKey = isMac ? '⌘' : 'Ctrl';
+
   // Compute tweak suggestions based on input
   const tweakSuggestions = React.useMemo<TweakSuggestion[]>(() => {
     if (!input || input.length < 20) return [];
@@ -419,12 +426,12 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
         <p className="text-xs text-muted-foreground text-center">
           {isRTL ? (
             <>
-              לחץ <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">⌘</kbd>+
+              לחץ <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">{modifierKey}</kbd>+
               <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">Enter</kbd> ליצירה
             </>
           ) : (
             <>
-              Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">⌘</kbd>+
+              Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">{modifierKey}</kbd>+
               <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">Enter</kbd> to generate
             </>
           )}
