@@ -82,6 +82,19 @@ export default {
       },
       boxShadow: {
         focus: '0 0 0 3px rgba(26, 115, 232, 0.15)',
+        card: '0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06)',
+        'card-hover':
+          '0 2px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06)',
+        button: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'button-hover': '0 1px 3px 0 rgba(0, 0, 0, 0.08)',
+        input: 'inset 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        'input-focus':
+          '0 0 0 2px hsl(var(--primary) / 0.1), inset 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        panel:
+          '0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 4px 12px -4px rgba(0, 0, 0, 0.05)',
+        dropdown: '0 2px 8px -2px rgba(0, 0, 0, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.06)',
+        primary: '0 1px 3px 0 hsl(var(--primary) / 0.15)',
+        'primary-hover': '0 2px 4px 0 hsl(var(--primary) / 0.2)',
       },
       keyframes: {
         'fade-in': {
