@@ -66,6 +66,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
     skills: [],
     thinking: undefined,
     behaviors: [],
+    custom: [],
   });
 
   // Output state
@@ -145,6 +146,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
             skills: parsed.selectedTweaks.skills || [],
             thinking: parsed.selectedTweaks.thinking,
             behaviors: parsed.selectedTweaks.behaviors || [],
+            custom: parsed.selectedTweaks.custom || [],
           });
         }
       } catch {
@@ -169,7 +171,8 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
       const hasTweaks =
         selectedTweaks.skills.length > 0 ||
         selectedTweaks.thinking ||
-        selectedTweaks.behaviors.length > 0;
+        selectedTweaks.behaviors.length > 0 ||
+        (selectedTweaks.custom && selectedTweaks.custom.length > 0);
 
       const response = await fetch('/api/generate', {
         method: 'POST',

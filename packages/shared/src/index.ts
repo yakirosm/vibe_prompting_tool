@@ -5,6 +5,7 @@ export * from './types/ai-provider';
 export * from './types/guidelines';
 export * from './types/custom-agent';
 export * from './types/tweaks';
+export * from './types/custom-tweak';
 
 // Constants
 export * from './constants/agent-dialects';

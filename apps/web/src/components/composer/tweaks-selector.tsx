@@ -1,8 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronDown, ChevronUp, Lightbulb, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ChevronDown, ChevronUp, Lightbulb, Sparkles, Plus, Settings2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Toggle } from '@/components/ui/toggle';
 import {
@@ -17,6 +17,7 @@ import {
   type TweakSuggestion,
   type ThinkingLevel,
   type TweakDefinition,
+  type CustomTweak,
   SKILL_TWEAKS,
   THINKING_TWEAKS,
   BEHAVIOR_TWEAKS,
@@ -42,12 +43,34 @@ export function TweaksSelector({
   disabled,
 }: TweaksSelectorProps) {
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [customTweaks, setCustomTweaks] = React.useState<CustomTweak[]>([]);
+  const [isLoadingCustom, setIsLoadingCustom] = React.useState(false);
+
+  // Fetch custom tweaks
+  React.useEffect(() => {
+    const fetchCustomTweaks = async () => {
+      setIsLoadingCustom(true);
+      try {
+        const response = await fetch('/api/tweaks?activeOnly=true');
+        if (response.ok) {
+          const data = await response.json();
+          setCustomTweaks(data.tweaks || []);
+        }
+      } catch {
+        // Silently fail - custom tweaks are optional
+      } finally {
+        setIsLoadingCustom(false);
+      }
+    };
+    fetchCustomTweaks();
+  }, []);
 
   // Calculate active count
   const activeCount =
     selectedTweaks.skills.length +
     (selectedTweaks.thinking ? 1 : 0) +
-    selectedTweaks.behaviors.length;
+    selectedTweaks.behaviors.length +
+    (selectedTweaks.custom?.length || 0);
 
   // Get suggested tweak IDs
   const suggestedIds = React.useMemo(
@@ -80,16 +103,26 @@ export function TweaksSelector({
   const handleBehaviorToggle = React.useCallback(
     (behaviorId: string) => {
       if (selectedTweaks.behaviors.includes(behaviorId)) {
-        // Removing - just remove it
         const newBehaviors = selectedTweaks.behaviors.filter((id) => id !== behaviorId);
         onTweaksChange({ ...selectedTweaks, behaviors: newBehaviors });
       } else {
-        // Adding - remove conflicts first
         const conflicts = getConflictingTweaks(behaviorId);
         const newBehaviors = selectedTweaks.behaviors.filter((id) => !conflicts.includes(id));
         newBehaviors.push(behaviorId);
         onTweaksChange({ ...selectedTweaks, behaviors: newBehaviors });
       }
+    },
+    [selectedTweaks, onTweaksChange]
+  );
+
+  // Handle custom tweak toggle
+  const handleCustomToggle = React.useCallback(
+    (customId: string) => {
+      const currentCustom = selectedTweaks.custom || [];
+      const newCustom = currentCustom.includes(customId)
+        ? currentCustom.filter((id) => id !== customId)
+        : [...currentCustom, customId];
+      onTweaksChange({ ...selectedTweaks, custom: newCustom });
     },
     [selectedTweaks, onTweaksChange]
   );
@@ -156,23 +189,69 @@ export function TweaksSelector({
     [disabled, selectedTweaks.behaviors]
   );
 
+  // Render a custom tweak button
+  const renderCustomTweakButton = React.useCallback(
+    (tweak: CustomTweak, isSelected: boolean) => {
+      return (
+        <TooltipProvider key={tweak.id}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="relative">
+                <Toggle
+                  pressed={isSelected}
+                  onPressedChange={() => handleCustomToggle(tweak.id)}
+                  disabled={disabled}
+                  size="sm"
+                  variant="outline"
+                  className={cn(
+                    'gap-1.5 text-xs transition-all',
+                    isSelected && 'bg-primary/10 border-primary/40 text-primary'
+                  )}
+                >
+                  <span className="text-sm">{tweak.icon || '✨'}</span>
+                  <span>{tweak.short_name}</span>
+                </Toggle>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-[280px]">
+              <div className="space-y-1.5">
+                <p className="font-medium">{tweak.name}</p>
+                {tweak.description && (
+                  <p className="text-xs text-muted-foreground">{tweak.description}</p>
+                )}
+                <p className="text-xs font-mono text-muted-foreground">Custom tweak</p>
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    },
+    [disabled, handleCustomToggle]
+  );
+
   // Get active tweaks for collapsed view
-  const activeTweaks = React.useMemo(() => {
-    const tweaks: TweakDefinition[] = [];
+  const activeTweaksList = React.useMemo(() => {
+    const tweaks: { id: string; icon?: string; label: string }[] = [];
+
     if (selectedTweaks.thinking) {
       const t = getTweakById(selectedTweaks.thinking);
-      if (t) tweaks.push(t);
+      if (t) tweaks.push({ id: t.id, icon: t.icon, label: t.label });
     }
     for (const skillId of selectedTweaks.skills) {
       const t = getTweakById(skillId);
-      if (t) tweaks.push(t);
+      if (t) tweaks.push({ id: t.id, icon: t.icon, label: t.label });
     }
     for (const behaviorId of selectedTweaks.behaviors) {
       const t = getTweakById(behaviorId);
-      if (t) tweaks.push(t);
+      if (t) tweaks.push({ id: t.id, icon: t.icon, label: t.label });
+    }
+    // Add custom tweaks
+    for (const customId of selectedTweaks.custom || []) {
+      const ct = customTweaks.find((c) => c.id === customId);
+      if (ct) tweaks.push({ id: ct.id, icon: ct.icon || '✨', label: ct.short_name });
     }
     return tweaks;
-  }, [selectedTweaks]);
+  }, [selectedTweaks, customTweaks]);
 
   // Token impact estimate
   const tokenImpact = React.useMemo(
@@ -237,9 +316,9 @@ export function TweaksSelector({
           )}
 
           {/* Active Tweaks Chips */}
-          {activeTweaks.length > 0 && (
+          {activeTweaksList.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {activeTweaks.map((tweak) => (
+              {activeTweaksList.map((tweak) => (
                 <Badge key={tweak.id} variant="outline" className="text-xs gap-1">
                   {tweak.icon && <span>{tweak.icon}</span>}
                   {tweak.label}
@@ -314,6 +393,42 @@ export function TweaksSelector({
                 )
               )}
             </div>
+          </div>
+
+          {/* Custom Tweaks Section */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Custom Tweaks
+              </h4>
+              <Link
+                href="/app/tweaks"
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Settings2 className="h-3 w-3" />
+                Manage
+              </Link>
+            </div>
+            {isLoadingCustom ? (
+              <p className="text-xs text-muted-foreground">Loading...</p>
+            ) : customTweaks.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {customTweaks.map((tweak) =>
+                  renderCustomTweakButton(
+                    tweak,
+                    selectedTweaks.custom?.includes(tweak.id) || false
+                  )
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/app/tweaks"
+                className="flex items-center gap-2 p-2 rounded-md border border-dashed text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>Create your first custom tweak</span>
+              </Link>
+            )}
           </div>
 
           {/* Token Impact Summary */}

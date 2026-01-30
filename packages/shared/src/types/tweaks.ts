@@ -21,6 +21,7 @@ export interface SelectedTweaks {
   skills: string[];
   thinking?: ThinkingLevel;
   behaviors: string[];
+  custom?: string[]; // IDs of custom tweaks
 }
 
 export interface TweakSuggestion {

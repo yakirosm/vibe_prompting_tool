@@ -6,6 +6,7 @@ import {
   type PromptGenerationOptions,
   type AIProviderType,
   type CustomAgent,
+  type CustomTweak,
   type SelectedTweaks,
   validatePromptGenerationOptions,
   DEFAULT_MODELS,
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest) {
         skills: body.tweaks.skills || [],
         thinking: body.tweaks.thinking,
         behaviors: body.tweaks.behaviors || [],
+        custom: body.tweaks.custom || [],
       };
     }
 
@@ -117,8 +119,23 @@ export async function POST(request: NextRequest) {
       customAgent = agentData as CustomAgent;
     }
 
+    // Fetch custom tweaks if any are selected
+    let customTweaks: CustomTweak[] = [];
+    if (tweaks?.custom && tweaks.custom.length > 0 && user) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data: tweaksData } = await (supabase as any)
+        .from('custom_tweaks')
+        .select('*')
+        .in('id', tweaks.custom)
+        .eq('user_id', user.id);
+
+      if (tweaksData) {
+        customTweaks = tweaksData as CustomTweak[];
+      }
+    }
+
     // Build messages
-    const messages = buildMessages(options, { provider, customAgent });
+    const messages = buildMessages(options, { provider, customAgent, customTweaks });
 
     // Create AI provider and generate
     const aiProvider = createAIProvider({

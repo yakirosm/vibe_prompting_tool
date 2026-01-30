@@ -4,6 +4,7 @@ import type {
   AIMessage,
   AIProviderType,
   CustomAgent,
+  CustomTweak,
   BuiltInAgentId,
   SelectedTweaks,
 } from '@prompt-ops/shared';
@@ -24,12 +25,13 @@ import {
 export interface PromptBuilderConfig {
   provider: AIProviderType;
   customAgent?: CustomAgent;
+  customTweaks?: CustomTweak[];
 }
 
 /**
  * Build instruction block from selected tweaks
  */
-export function buildTweakInstructions(tweaks?: SelectedTweaks): string | null {
+export function buildTweakInstructions(tweaks?: SelectedTweaks, customTweaks?: CustomTweak[]): string | null {
   if (!tweaks) return null;
 
   const parts: string[] = [];
@@ -58,6 +60,16 @@ export function buildTweakInstructions(tweaks?: SelectedTweaks): string | null {
       const tweak = getTweakById(behaviorId);
       if (tweak && tweak.category === 'behavior') {
         parts.push(tweak.instruction);
+      }
+    }
+  }
+
+  // Add custom tweak instructions
+  if (tweaks.custom && tweaks.custom.length > 0 && customTweaks) {
+    for (const customId of tweaks.custom) {
+      const customTweak = customTweaks.find((ct) => ct.id === customId);
+      if (customTweak) {
+        parts.push(`CUSTOM TWEAK: ${customTweak.name}\n${customTweak.instruction}`);
       }
     }
   }
@@ -106,7 +118,7 @@ export function buildSystemPrompt(
   }
 
   // Add tweaks instructions if any are selected
-  const tweakInstructions = buildTweakInstructions(options.tweaks);
+  const tweakInstructions = buildTweakInstructions(options.tweaks, config.customTweaks);
   if (tweakInstructions) {
     parts.push('\n---\n' + tweakInstructions);
   }
