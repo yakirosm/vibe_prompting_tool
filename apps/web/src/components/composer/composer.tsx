@@ -61,6 +61,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
   const [output, setOutput] = React.useState<GeneratedPrompt | null>(null);
   const [activeVariant, setActiveVariant] = React.useState<PromptLength>('standard');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isAnswering, setIsAnswering] = React.useState(false);
 
   // Linter state
   const [suggestions, setSuggestions] = React.useState<LinterSuggestion[]>([]);
@@ -192,6 +193,56 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
   const handleDismissSuggestion = React.useCallback((index: number) => {
     setDismissedSuggestions((prev) => new Set([...prev, index]));
   }, []);
+
+  // Handle answers to clarifying questions - regenerate with answers included
+  const handleAnswerQuestions = React.useCallback(async (answers: Record<number, string>) => {
+    if (!output?.clarifyingQuestions) return;
+
+    setIsAnswering(true);
+
+    try {
+      // Build the answers text to append to the input
+      const answersText = output.clarifyingQuestions
+        .map((question, idx) => {
+          const answer = answers[idx];
+          if (answer) {
+            return `Q: ${question}\nA: ${answer}`;
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .join('\n\n');
+
+      // Regenerate with the answers included as additional context
+      const enhancedInput = `${input}\n\n---\nAdditional context from clarifying questions:\n${answersText}`;
+
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          input: enhancedInput,
+          agent,
+          length,
+          strategy,
+          askClarifyingQuestions: false, // Don't ask more questions after answering
+          projectContext: projectContext.trim() || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to update prompt');
+      }
+
+      const data = await response.json();
+      setOutput(data.prompt);
+      toast.success('Prompt updated with your answers');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update prompt');
+    } finally {
+      setIsAnswering(false);
+    }
+  }, [output, input, agent, length, strategy, projectContext]);
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent) => {
@@ -348,7 +399,9 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
         onVariantChange={setActiveVariant}
         onRegenerate={handleRegenerate}
         onSave={handleSave}
+        onAnswerQuestions={handleAnswerQuestions}
         isLoading={isLoading}
+        isAnswering={isAnswering}
         isAuthenticated={isAuthenticated}
       />
     </div>

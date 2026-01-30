@@ -1,14 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Copy, RotateCcw, Save, Check, HelpCircle, Sparkles } from 'lucide-react';
+import { Copy, RotateCcw, Save, Check, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { GeneratedPrompt, PromptLength } from '@prompt-ops/shared';
 import { formatPromptForCopy } from '@/lib/ai/prompt-builder';
+import { ClarifyingQuestionsForm } from './clarifying-questions-form';
 
 interface OutputPanelProps {
   output: GeneratedPrompt | null;
@@ -17,7 +17,9 @@ interface OutputPanelProps {
   onVariantChange: (variant: PromptLength) => void;
   onRegenerate: () => void;
   onSave: () => void;
+  onAnswerQuestions?: (answers: Record<number, string>) => void;
   isLoading?: boolean;
+  isAnswering?: boolean;
   isAuthenticated?: boolean;
 }
 
@@ -28,7 +30,9 @@ export function OutputPanel({
   onVariantChange,
   onRegenerate,
   onSave,
+  onAnswerQuestions,
   isLoading,
+  isAnswering = false,
   isAuthenticated = false,
 }: OutputPanelProps) {
   const [copied, setCopied] = React.useState(false);
@@ -100,24 +104,14 @@ export function OutputPanel({
               {formatPromptForCopy(currentOutput)}
             </div>
 
-            {/* Highlighted questions section */}
-            {hasQuestions && (
-              <div className="mt-6 p-4 rounded-lg bg-primary/5 border border-primary/20 animate-slide-up">
-                <div className="flex items-center gap-2 mb-3">
-                  <HelpCircle className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium text-primary">Clarifying Questions</span>
-                  <Badge variant="secondary" className="text-xs">
-                    {currentOutput.clarifyingQuestions!.length} questions
-                  </Badge>
-                </div>
-                <ul className="space-y-2">
-                  {currentOutput.clarifyingQuestions!.map((question, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm">
-                      <span className="text-primary font-medium shrink-0">{idx + 1}.</span>
-                      <span>{question}</span>
-                    </li>
-                  ))}
-                </ul>
+            {/* Interactive Clarifying Questions Form */}
+            {hasQuestions && onAnswerQuestions && (
+              <div className="mt-6">
+                <ClarifyingQuestionsForm
+                  questions={currentOutput.clarifyingQuestions!}
+                  onSubmit={onAnswerQuestions}
+                  isSubmitting={isAnswering}
+                />
               </div>
             )}
           </div>
