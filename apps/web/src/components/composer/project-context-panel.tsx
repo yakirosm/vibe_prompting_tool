@@ -11,7 +11,11 @@ import {
   X,
   Check,
   Sparkles,
+  FolderPlus,
+  ExternalLink,
 } from 'lucide-react';
+import { toast } from 'sonner';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -19,12 +23,28 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ProjectFormDialog } from '@/components/projects/project-form-dialog';
 import { cn } from '@/lib/utils';
+
+interface Project {
+  id: string;
+  name: string;
+  description: string | null;
+  stack_summary: string | null;
+  context_pack: string | null;
+  default_agent: string | null;
+  default_mode: string | null;
+  development_log: string[] | null;
+  created_at: string;
+  updated_at: string;
+}
 
 interface ProjectContextPanelProps {
   context: string;
   onContextChange: (context: string) => void;
   disabled?: boolean;
+  isAuthenticated?: boolean;
+  onProjectCreated?: (project: Project) => void;
 }
 
 type InputMethod = 'manual' | 'form' | 'paste' | 'chat';
@@ -40,6 +60,8 @@ export function ProjectContextPanel({
   context,
   onContextChange,
   disabled,
+  isAuthenticated = false,
+  onProjectCreated,
 }: ProjectContextPanelProps) {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [activeMethod, setActiveMethod] = React.useState<InputMethod>('manual');
@@ -51,6 +73,7 @@ export function ProjectContextPanel({
   });
   const [pastedResponse, setPastedResponse] = React.useState('');
   const [isParsing, setIsParsing] = React.useState(false);
+  const [showProjectDialog, setShowProjectDialog] = React.useState(false);
 
   const hasContext = context.trim().length > 0;
 
@@ -141,6 +164,48 @@ export function ProjectContextPanel({
     });
     setPastedResponse('');
   }, [onContextChange]);
+
+  // Build initial project data from current form/context for pre-filling the dialog
+  const getInitialProjectData = React.useCallback(() => {
+    // If form has data, use it
+    if (formData.projectName || formData.techStack || formData.description) {
+      return {
+        name: formData.projectName || 'New Project',
+        description: formData.description || null,
+        stack_summary: formData.techStack || null,
+        context_pack: context || null,
+      };
+    }
+    // Otherwise use the manual context
+    if (context) {
+      return {
+        name: 'New Project',
+        description: null,
+        stack_summary: null,
+        context_pack: context,
+      };
+    }
+    return null;
+  }, [formData, context]);
+
+  const handleProjectCreated = React.useCallback((project: Project) => {
+    // Apply the project's context pack to the context panel
+    if (project.context_pack) {
+      onContextChange(project.context_pack);
+    } else {
+      // Build context from project fields
+      const parts: string[] = [];
+      if (project.name) parts.push(`Project: ${project.name}`);
+      if (project.stack_summary) parts.push(`Tech Stack: ${project.stack_summary}`);
+      if (project.description) parts.push(`Description: ${project.description}`);
+      if (parts.length > 0) {
+        onContextChange(parts.join('\n\n'));
+      }
+    }
+
+    toast.success(`Project "${project.name}" created and context applied!`);
+    onProjectCreated?.(project);
+  }, [onContextChange, onProjectCreated]);
 
   const inputMethods = [
     { id: 'manual' as const, label: 'Manual', icon: FileText },
@@ -317,21 +382,60 @@ export function ProjectContextPanel({
             </TabsContent>
           </Tabs>
 
-          {/* Clear button */}
-          {hasContext && (
-            <div className="mt-4 pt-3 border-t">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearContext}
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-              >
-                <X className="h-3 w-3 mr-1" />
-                Clear Context
-              </Button>
+          {/* Action buttons */}
+          <div className="mt-4 pt-3 border-t flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              {hasContext && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearContext}
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Clear Context
+                </Button>
+              )}
             </div>
-          )}
+
+            <div className="flex items-center gap-2">
+              {isAuthenticated ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowProjectDialog(true)}
+                  disabled={disabled}
+                  className="gap-1.5"
+                >
+                  <FolderPlus className="h-3.5 w-3.5" />
+                  Create Project
+                </Button>
+              ) : (
+                <Link href="/app/projects">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-1.5 text-muted-foreground"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    Manage Projects
+                  </Button>
+                </Link>
+              )}
+            </div>
+          </div>
         </CardContent>
+      )}
+
+      {/* Project Creation Dialog */}
+      {isAuthenticated && (
+        <ProjectFormDialog
+          open={showProjectDialog}
+          onOpenChange={setShowProjectDialog}
+          project={null}
+          onSuccess={handleProjectCreated}
+          initialData={getInitialProjectData()}
+        />
       )}
     </Card>
   );

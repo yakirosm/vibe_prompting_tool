@@ -27,6 +27,7 @@ interface Project {
   context_pack: string | null;
   default_agent: string | null;
   default_mode: string | null;
+  development_log: string[] | null;
   created_at: string;
   updated_at: string;
 }

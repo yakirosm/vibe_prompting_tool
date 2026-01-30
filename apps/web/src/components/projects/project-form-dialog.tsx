@@ -31,6 +31,16 @@ interface Project {
   context_pack: string | null;
   default_agent: string | null;
   default_mode: string | null;
+  development_log: string[] | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface InitialProjectData {
+  name?: string;
+  description?: string | null;
+  stack_summary?: string | null;
+  context_pack?: string | null;
 }
 
 interface ProjectFormDialogProps {
@@ -38,6 +48,7 @@ interface ProjectFormDialogProps {
   onOpenChange: (open: boolean) => void;
   project?: Project | null;
   onSuccess: (project: Project) => void;
+  initialData?: InitialProjectData | null;
 }
 
 export function ProjectFormDialog({
@@ -45,6 +56,7 @@ export function ProjectFormDialog({
   onOpenChange,
   project,
   onSuccess,
+  initialData,
 }: ProjectFormDialogProps) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [formData, setFormData] = React.useState({
@@ -68,6 +80,16 @@ export function ProjectFormDialog({
         default_agent: project.default_agent || 'cursor',
         default_mode: project.default_mode || 'quick',
       });
+    } else if (initialData) {
+      // Pre-fill from initialData (e.g., from project context panel)
+      setFormData({
+        name: initialData.name || '',
+        description: initialData.description || '',
+        stack_summary: initialData.stack_summary || '',
+        context_pack: initialData.context_pack || '',
+        default_agent: 'cursor',
+        default_mode: 'quick',
+      });
     } else {
       setFormData({
         name: '',
@@ -78,7 +100,7 @@ export function ProjectFormDialog({
         default_mode: 'quick',
       });
     }
-  }, [project, open]);
+  }, [project, initialData, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

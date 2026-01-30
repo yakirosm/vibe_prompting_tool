@@ -342,6 +342,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
         context={projectContext}
         onContextChange={setProjectContext}
         disabled={isLoading}
+        isAuthenticated={isAuthenticated}
       />
 
       <OptionsBar
