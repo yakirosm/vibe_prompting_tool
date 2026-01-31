@@ -6,6 +6,7 @@ export * from './types/guidelines';
 export * from './types/custom-agent';
 export * from './types/tweaks';
 export * from './types/custom-tweak';
+export * from './types/tag';
 
 // Constants
 export * from './constants/agent-dialects';
