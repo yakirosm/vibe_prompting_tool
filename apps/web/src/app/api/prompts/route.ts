@@ -13,6 +13,7 @@ interface SavePromptRequest {
   length: PromptLength;
   strategy: PromptStrategy;
   generatedPrompt: GeneratedPrompt;
+  tags?: string[];
 }
 
 export async function POST(request: NextRequest) {
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body: SavePromptRequest = await request.json();
-    const { input, agent, length, strategy, generatedPrompt } = body;
+    const { input, agent, length, strategy, generatedPrompt, tags } = body;
 
     // Validate required fields
     if (!input || !agent || !generatedPrompt) {
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
       output_prompt: outputPrompt,
       variant_type: length,
       strategy: strategy,
+      tags: tags || null,
     };
 
     // Save to database

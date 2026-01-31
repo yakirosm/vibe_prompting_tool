@@ -22,6 +22,7 @@ import {
   type InputLanguage,
   type SelectedTweaks,
   type TweakSuggestion,
+  type Tag,
   lintPromptInput,
   validatePromptInput,
   detectInputLanguage,
@@ -47,6 +48,7 @@ interface SavePromptData {
   length: PromptLength;
   strategy: PromptStrategy;
   generatedPrompt: GeneratedPrompt;
+  tags?: string[];
 }
 
 interface ComposerProps {
@@ -83,6 +85,10 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
   const [showWelcome, setShowWelcome] = React.useState(true);
   const [discoveryCopied, setDiscoveryCopied] = React.useState(false);
 
+  // Tags state
+  const [selectedPromptTags, setSelectedPromptTags] = React.useState<string[]>([]);
+  const [availableTags, setAvailableTags] = React.useState<Tag[]>([]);
+
   // Language detection for RTL support
   const detectedLanguage = React.useMemo<InputLanguage>(() => {
     if (!input || input.length < 10) return 'en';
@@ -103,6 +109,15 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
     const currentAgent = isCustomAgentId(agent) ? undefined : (agent as BuiltInAgentId);
     return suggestTweaks({ input, currentAgent });
   }, [input, agent]);
+
+  // Fetch available tags on mount (when authenticated)
+  React.useEffect(() => {
+    if (!isAuthenticated) return;
+    fetch('/api/tags')
+      .then((res) => (res.ok ? res.json() : { tags: [] }))
+      .then((data) => setAvailableTags(data.tags || []))
+      .catch(() => {});
+  }, [isAuthenticated]);
 
   // Hide welcome when user starts typing
   React.useEffect(() => {
@@ -162,6 +177,22 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
     }
   }, []);
 
+  // Handle creating a new tag
+  const handleCreateTag = React.useCallback(
+    async (name: string, color: string) => {
+      const response = await fetch('/api/tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, color }),
+      });
+      if (!response.ok) throw new Error('Failed to create tag');
+      const data = await response.json();
+      setAvailableTags((prev) => [...prev, data.tag]);
+      setSelectedPromptTags((prev) => [...prev, data.tag.name]);
+    },
+    []
+  );
+
   const handleGenerate = React.useCallback(async () => {
     // Validate input
     const validation = validatePromptInput(input);
@@ -172,6 +203,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
 
     setIsLoading(true);
     setOutput(null);
+    setSelectedPromptTags([]); // Reset tags on new generation
 
     try {
       // Only include tweaks if any are selected
@@ -224,13 +256,14 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
           length,
           strategy,
           generatedPrompt: output,
+          tags: selectedPromptTags.length > 0 ? selectedPromptTags : undefined,
         });
         toast.success('Prompt saved');
       } catch {
         toast.error('Failed to save prompt');
       }
     }
-  }, [output, onSave, input, agent, length, strategy]);
+  }, [output, onSave, input, agent, length, strategy, selectedPromptTags]);
 
   const handleDismissSuggestion = React.useCallback((index: number) => {
     setDismissedSuggestions((prev) => new Set([...prev, index]));
@@ -453,6 +486,10 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
         isLoading={isLoading}
         isAnswering={isAnswering}
         isAuthenticated={isAuthenticated}
+        availableTags={availableTags}
+        selectedTags={selectedPromptTags}
+        onTagsChange={setSelectedPromptTags}
+        onCreateTag={handleCreateTag}
       />
     </div>
   );
