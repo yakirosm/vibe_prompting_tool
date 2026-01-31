@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Settings, Moon, Sun, Sparkles, LogOut, User, Library, FolderKanban, Bot, Wand2 } from 'lucide-react';
+import { Settings, Moon, Sun, Sparkles, LogOut, User, Library, FolderKanban, Bot, Tag, Wand2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import {
@@ -134,6 +134,19 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Custom Agents</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href="/app/tags" aria-label="Tags">
+                        <Tag className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Tags</p>
                   </TooltipContent>
                 </Tooltip>
 
