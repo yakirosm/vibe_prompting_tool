@@ -21,6 +21,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import type { Tag } from '@prompt-ops/shared';
 
 interface Prompt {
   id: string;
@@ -36,6 +37,7 @@ interface Prompt {
 
 export default function LibraryPage() {
   const [prompts, setPrompts] = React.useState<Prompt[]>([]);
+  const [tags, setTags] = React.useState<Tag[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [total, setTotal] = React.useState(0);
   const [page, setPage] = React.useState(0);
@@ -45,6 +47,7 @@ export default function LibraryPage() {
     search: '',
     agent: '',
     strategy: '',
+    tags: [],
     favoritesOnly: false,
     sortBy: 'created_at',
     sortOrder: 'desc',
@@ -65,6 +68,7 @@ export default function LibraryPage() {
       if (filters.search) params.set('search', filters.search);
       if (filters.agent) params.set('agent', filters.agent);
       if (filters.strategy) params.set('strategy', filters.strategy);
+      if (filters.tags.length > 0) params.set('tags', filters.tags.join(','));
       if (filters.favoritesOnly) params.set('favorites', 'true');
 
       const response = await fetch(`/api/prompts?${params}`);
@@ -83,6 +87,22 @@ export default function LibraryPage() {
   React.useEffect(() => {
     fetchPrompts();
   }, [fetchPrompts]);
+
+  // Fetch tags on mount
+  React.useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await fetch('/api/tags');
+        if (response.ok) {
+          const data = await response.json();
+          setTags(data.tags || []);
+        }
+      } catch {
+        // Silently fail - tags are optional
+      }
+    };
+    fetchTags();
+  }, []);
 
   // Reset page when filters change
   React.useEffect(() => {
@@ -134,7 +154,12 @@ export default function LibraryPage() {
   };
 
   const handleTagClick = (tag: string) => {
-    setFilters((prev) => ({ ...prev, search: tag }));
+    setFilters((prev) => {
+      const newTags = prev.tags.includes(tag)
+        ? prev.tags
+        : [...prev.tags, tag];
+      return { ...prev, tags: newTags };
+    });
   };
 
   const totalPages = Math.ceil(total / LIMIT);
@@ -153,6 +178,7 @@ export default function LibraryPage() {
         onFiltersChange={setFilters}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        availableTags={tags}
       />
 
       {isLoading ? (
@@ -164,7 +190,7 @@ export default function LibraryPage() {
           <FileText className="h-12 w-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium">No prompts found</h3>
           <p className="text-muted-foreground mt-1">
-            {filters.search || filters.agent || filters.strategy || filters.favoritesOnly
+            {filters.search || filters.agent || filters.strategy || filters.tags.length > 0 || filters.favoritesOnly
               ? 'Try adjusting your filters'
               : 'Generate and save prompts to see them here'}
           </p>

@@ -127,6 +127,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || '';
     const agent = searchParams.get('agent') || '';
     const strategy = searchParams.get('strategy') || '';
+    const tags = searchParams.get('tags') || '';
     const favoritesOnly = searchParams.get('favorites') === 'true';
     const sortBy = searchParams.get('sortBy') || 'created_at';
     const sortOrder = searchParams.get('sortOrder') === 'asc' ? true : false;
@@ -150,6 +151,12 @@ export async function GET(request: NextRequest) {
     }
     if (favoritesOnly) {
       query = query.eq('is_favorite', true);
+    }
+    if (tags) {
+      const tagArray = tags.split(',').filter(Boolean);
+      if (tagArray.length > 0) {
+        query = query.overlaps('tags', tagArray);
+      }
     }
 
     // Apply sorting and pagination

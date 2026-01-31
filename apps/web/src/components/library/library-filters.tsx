@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Search, Star, X, LayoutGrid, List } from 'lucide-react';
+import { Search, Star, X, LayoutGrid, List, Tag as TagIcon, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
@@ -12,7 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AGENT_OPTIONS } from '@prompt-ops/shared';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
+import { AGENT_OPTIONS, type Tag } from '@prompt-ops/shared';
 
 export type ViewMode = 'grid' | 'list';
 export type SortBy = 'created_at' | 'agent_profile_id';
@@ -22,6 +29,7 @@ export interface LibraryFilters {
   search: string;
   agent: string;
   strategy: string;
+  tags: string[];
   favoritesOnly: boolean;
   sortBy: SortBy;
   sortOrder: SortOrder;
@@ -32,6 +40,7 @@ interface LibraryFiltersProps {
   onFiltersChange: (filters: LibraryFilters) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  availableTags: Tag[];
 }
 
 export function LibraryFiltersBar({
@@ -39,6 +48,7 @@ export function LibraryFiltersBar({
   onFiltersChange,
   viewMode,
   onViewModeChange,
+  availableTags,
 }: LibraryFiltersProps) {
   const updateFilter = <K extends keyof LibraryFilters>(
     key: K,
@@ -51,6 +61,7 @@ export function LibraryFiltersBar({
     filters.search ||
     filters.agent ||
     filters.strategy ||
+    filters.tags.length > 0 ||
     filters.favoritesOnly;
 
   const clearFilters = () => {
@@ -58,10 +69,18 @@ export function LibraryFiltersBar({
       search: '',
       agent: '',
       strategy: '',
+      tags: [],
       favoritesOnly: false,
       sortBy: 'created_at',
       sortOrder: 'desc',
     });
+  };
+
+  const toggleTag = (tagName: string) => {
+    const newTags = filters.tags.includes(tagName)
+      ? filters.tags.filter((t) => t !== tagName)
+      : [...filters.tags, tagName];
+    onFiltersChange({ ...filters, tags: newTags });
   };
 
   return (
@@ -129,6 +148,40 @@ export function LibraryFiltersBar({
             <SelectItem value="diagnose">Diagnose</SelectItem>
           </SelectContent>
         </Select>
+
+        {availableTags.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2 min-w-[120px]">
+                <TagIcon className="h-4 w-4" />
+                {filters.tags.length > 0 ? `Tags (${filters.tags.length})` : 'All Tags'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-[200px]">
+              {availableTags.map((tag) => (
+                <DropdownMenuItem
+                  key={tag.id}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleTag(tag.name);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <div className="flex items-center gap-2 w-full">
+                    <div
+                      className="h-3 w-3 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: tag.color }}
+                    />
+                    <span className="flex-1 truncate">{tag.name}</span>
+                    {filters.tags.includes(tag.name) && (
+                      <Check className="h-4 w-4 text-primary" />
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
 
         <Select
           value={`${filters.sortBy}-${filters.sortOrder}`}
