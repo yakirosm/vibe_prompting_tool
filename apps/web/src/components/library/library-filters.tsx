@@ -50,6 +50,15 @@ export function LibraryFiltersBar({
   onViewModeChange,
   availableTags,
 }: LibraryFiltersProps) {
+  const [tagSearch, setTagSearch] = React.useState('');
+
+  const filteredTags = React.useMemo(() => {
+    if (!tagSearch.trim()) return availableTags;
+    return availableTags.filter((tag) =>
+      tag.name.toLowerCase().includes(tagSearch.toLowerCase())
+    );
+  }, [availableTags, tagSearch]);
+
   const updateFilter = <K extends keyof LibraryFilters>(
     key: K,
     value: LibraryFilters[K]
@@ -150,35 +159,53 @@ export function LibraryFiltersBar({
         </Select>
 
         {availableTags.length > 0 && (
-          <DropdownMenu>
+          <DropdownMenu onOpenChange={(open) => { if (!open) setTagSearch(''); }}>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2 min-w-[120px]">
                 <TagIcon className="h-4 w-4" />
                 {filters.tags.length > 0 ? `Tags (${filters.tags.length})` : 'All Tags'}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-[200px]">
-              {availableTags.map((tag) => (
-                <DropdownMenuItem
-                  key={tag.id}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    toggleTag(tag.name);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <div
-                      className="h-3 w-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: tag.color }}
-                    />
-                    <span className="flex-1 truncate">{tag.name}</span>
-                    {filters.tags.includes(tag.name) && (
-                      <Check className="h-4 w-4 text-primary" />
-                    )}
-                  </div>
-                </DropdownMenuItem>
-              ))}
+            <DropdownMenuContent align="start" className="w-[220px]">
+              {availableTags.length > 5 && (
+                <div className="px-2 pb-2">
+                  <Input
+                    placeholder="Search tags..."
+                    value={tagSearch}
+                    onChange={(e) => setTagSearch(e.target.value)}
+                    className="h-8 text-sm"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+              )}
+              {filteredTags.length === 0 ? (
+                <div className="px-2 py-2 text-sm text-muted-foreground text-center">
+                  No matching tags
+                </div>
+              ) : (
+                filteredTags.map((tag) => (
+                  <DropdownMenuItem
+                    key={tag.id}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggleTag(tag.name);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <div
+                        className="h-3 w-3 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: tag.color }}
+                      />
+                      <span className="flex-1 truncate">{tag.name}</span>
+                      {filters.tags.includes(tag.name) && (
+                        <Check className="h-4 w-4 text-primary" />
+                      )}
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}

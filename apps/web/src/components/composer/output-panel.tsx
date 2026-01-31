@@ -70,6 +70,14 @@ export function OutputPanel({
   const [newTagName, setNewTagName] = React.useState('');
   const [newTagColor, setNewTagColor] = React.useState('#6366f1');
   const [isCreatingTag, setIsCreatingTag] = React.useState(false);
+  const [tagSearch, setTagSearch] = React.useState('');
+
+  const filteredTags = React.useMemo(() => {
+    if (!tagSearch.trim()) return availableTags;
+    return availableTags.filter((tag) =>
+      tag.name.toLowerCase().includes(tagSearch.toLowerCase())
+    );
+  }, [availableTags, tagSearch]);
 
   const handleToggleTag = React.useCallback((tagName: string) => {
     if (!onTagsChange) return;
@@ -216,7 +224,7 @@ export function OutputPanel({
             </div>
 
             {/* Tag dropdown */}
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={(open) => { if (!open) setTagSearch(''); }}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -229,24 +237,42 @@ export function OutputPanel({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56">
+                {availableTags.length > 5 && (
+                  <div className="px-2 pb-2">
+                    <Input
+                      placeholder="Search tags..."
+                      value={tagSearch}
+                      onChange={(e) => setTagSearch(e.target.value)}
+                      className="h-8 text-sm"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                  </div>
+                )}
                 {availableTags.length > 0 ? (
                   <>
-                    {availableTags.map((tag) => (
-                      <DropdownMenuCheckboxItem
-                        key={tag.id}
-                        checked={selectedTags.includes(tag.name)}
-                        onCheckedChange={() => handleToggleTag(tag.name)}
-                        onSelect={(e) => e.preventDefault()}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="h-3 w-3 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: tag.color }}
-                          />
-                          <span>{tag.name}</span>
-                        </div>
-                      </DropdownMenuCheckboxItem>
-                    ))}
+                    {filteredTags.length === 0 ? (
+                      <div className="px-2 py-2 text-sm text-muted-foreground text-center">
+                        No matching tags
+                      </div>
+                    ) : (
+                      filteredTags.map((tag) => (
+                        <DropdownMenuCheckboxItem
+                          key={tag.id}
+                          checked={selectedTags.includes(tag.name)}
+                          onCheckedChange={() => handleToggleTag(tag.name)}
+                          onSelect={(e) => e.preventDefault()}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-3 w-3 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: tag.color }}
+                            />
+                            <span>{tag.name}</span>
+                          </div>
+                        </DropdownMenuCheckboxItem>
+                      ))
+                    )}
                     <DropdownMenuSeparator />
                   </>
                 ) : (

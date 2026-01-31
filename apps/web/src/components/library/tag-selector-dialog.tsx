@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
-import { Check } from 'lucide-react';
+import { Check, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +38,14 @@ export function TagSelectorDialog({
 }: TagSelectorDialogProps) {
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedTags, setSelectedTags] = React.useState<string[]>([]);
+  const [tagSearch, setTagSearch] = React.useState('');
+
+  const filteredTags = React.useMemo(() => {
+    if (!tagSearch.trim()) return availableTags;
+    return availableTags.filter((tag) =>
+      tag.name.toLowerCase().includes(tagSearch.toLowerCase())
+    );
+  }, [availableTags, tagSearch]);
 
   // Initialize selected tags when prompt changes
   React.useEffect(() => {
@@ -44,6 +53,13 @@ export function TagSelectorDialog({
       setSelectedTags(prompt.tags || []);
     }
   }, [prompt]);
+
+  // Reset search when dialog closes
+  React.useEffect(() => {
+    if (!open) {
+      setTagSearch('');
+    }
+  }, [open]);
 
   const toggleTag = (tagName: string) => {
     setSelectedTags((prev) =>
@@ -89,40 +105,59 @@ export function TagSelectorDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="py-4 space-y-3">
           {availableTags.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No tags available. Create tags in Settings to organize your prompts.
             </p>
           ) : (
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => {
-                const isSelected = selectedTags.includes(tag.name);
-                return (
-                  <button
-                    key={tag.id}
-                    type="button"
-                    onClick={() => toggleTag(tag.name)}
-                    className={cn(
-                      'flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm transition-all',
-                      'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
-                      isSelected && 'ring-2 ring-offset-1 ring-primary'
-                    )}
-                    style={{
-                      backgroundColor: isSelected ? `${tag.color}30` : `${tag.color}10`,
-                      borderColor: tag.color,
-                    }}
-                  >
-                    <div
-                      className="h-3 w-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: tag.color }}
-                    />
-                    <span>{tag.name}</span>
-                    {isSelected && <Check className="h-4 w-4" />}
-                  </button>
-                );
-              })}
-            </div>
+            <>
+              {availableTags.length > 5 && (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search tags..."
+                    value={tagSearch}
+                    onChange={(e) => setTagSearch(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+              )}
+              {filteredTags.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No matching tags
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {filteredTags.map((tag) => {
+                    const isSelected = selectedTags.includes(tag.name);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => toggleTag(tag.name)}
+                        className={cn(
+                          'flex items-center gap-2 px-3 py-1.5 rounded-md border text-sm transition-all',
+                          'hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
+                          isSelected && 'ring-2 ring-offset-1 ring-primary'
+                        )}
+                        style={{
+                          backgroundColor: isSelected ? `${tag.color}30` : `${tag.color}10`,
+                          borderColor: tag.color,
+                        }}
+                      >
+                        <div
+                          className="h-3 w-3 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: tag.color }}
+                        />
+                        <span>{tag.name}</span>
+                        {isSelected && <Check className="h-4 w-4" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </div>
 
