@@ -1,15 +1,16 @@
 # Prompt Ops Copilot - Project Status & User Guide
 
-**Last Updated:** January 30, 2026
+**Last Updated:** January 31, 2026
 **Status:** Extended MVP - Major Features Implemented
 
-> **Latest Session (Jan 30, 2026 - Evening):**
-> - Implemented Custom Agents feature with full CRUD capabilities
-> - Created /app/agents page with search, grid/list views
-> - Added AgentCard and AgentFormDialog UI components
-> - Integrated custom agents into Target Agent dropdown
-> - Updated prompt builder for custom agent dialect generation
-> - Added database migration 003 for custom_agents extension
+> **Latest Session (Jan 31, 2026):**
+> - Implemented Tag Management UI with full CRUD and color picker
+> - Created /app/tags page with search, grid/list views
+> - Added tag filtering to Prompt Library
+> - Display colored tag badges on prompt cards
+> - Added "Manage Tags" feature to apply tags to existing prompts
+> - Added tag selection to Composer for tagging new prompts
+> - Inline tag creation in Composer (create tags without leaving the page)
 
 ---
 
@@ -55,12 +56,14 @@
 | **Prompt Library (/app/library)** | ✅ Complete |
 | **Project Management** | ✅ Complete |
 | **Database migration v2** | ✅ Complete |
-| **Custom Agents (/app/agents)** | ✅ **NEW** |
-| **Database migration v3** | ✅ **NEW** |
+| **Custom Agents (/app/agents)** | ✅ Complete |
+| **Database migration v3** | ✅ Complete |
+| **Tag Management (/app/tags)** | ✅ **NEW** |
+| **Tag-Prompt Integration** | ✅ **NEW** |
+| **Composer Tag Selection** | ✅ **NEW** |
 
 ### Not Yet Implemented
 
-- Tag management UI (API ready)
 - Project Discovery features
 - Smart Form mode
 - Wizard mode
@@ -76,9 +79,10 @@
 A Next.js 15 application with:
 
 - **Landing Page** (`/`) - Marketing page with feature highlights
-- **Composer** (`/app`) - Main Quick Convert interface with RTL support
-- **Prompt Library** (`/app/library`) - View, search, filter saved prompts
+- **Composer** (`/app`) - Main Quick Convert interface with RTL support and tag selection
+- **Prompt Library** (`/app/library`) - View, search, filter saved prompts with tag support
 - **Projects** (`/app/projects`) - Project management with context packs
+- **Tags** (`/app/tags`) - Tag management with color picker
 - **Settings** (`/app/settings`) - AI provider configuration
 - **Auth** (`/login`, `/signup`) - Authentication pages
 
@@ -104,12 +108,23 @@ A Next.js 15 application with:
 
 - **Card/List View** - Toggle between grid and list layouts
 - **Search** - Full-text search on input and output
-- **Filters** - By agent, strategy, favorites
+- **Filters** - By agent, strategy, favorites, tags
 - **Sorting** - By date (newest/oldest), agent
-- **Actions** - Copy, favorite toggle, delete
+- **Actions** - Copy, favorite toggle, delete, manage tags
 - **Pagination** - Browse large collections
+- **Tag Badges** - Colored tags displayed on prompt cards
 
-### 4. Project Management
+### 4. Tag Management (`/app/tags`)
+
+- **Tag List** - Card/list view with search
+- **Create/Edit Tags** - Name and color picker (10 preset colors)
+- **Delete Tags** - With confirmation dialog
+- **Apply to Prompts** - Via Library "Manage Tags" or Composer
+- **Filter by Tags** - Multi-select tag filter in Library
+- **Composer Integration** - Add tags when creating prompts
+- **Inline Creation** - Create new tags without leaving Composer
+
+### 5. Project Management
 
 - **Project List** - Card/list view with search
 - **Project Detail** - Context pack, development log, prompts
@@ -117,7 +132,7 @@ A Next.js 15 application with:
 - **Development Log** - Track progress and changes
 - **Project Settings** - Default agent, mode, tech stack
 
-### 5. Custom Agents (`/app/agents`)
+### 6. Custom Agents (`/app/agents`)
 
 - **Agent List** - Card/list view with search
 - **Create Agent** - Name, description, icon, tone, emphasis
@@ -126,7 +141,7 @@ A Next.js 15 application with:
 - **Dropdown Integration** - Custom agents appear in Target Agent selector
 - **Prompt Generation** - Custom dialect applied during generation
 
-### 6. RTL Support
+### 7. RTL Support
 
 - Hebrew input automatically detected
 - Panels swap: Hebrew input on RIGHT, output on LEFT
@@ -149,19 +164,22 @@ prompt-ops-copilot/
 │       │   │   │   ├── page.tsx      # Composer
 │       │   │   │   ├── library/      # Prompt Library
 │       │   │   │   ├── projects/     # Project Management
-│       │   │   │   ├── agents/       # Custom Agents (NEW)
+│       │   │   │   ├── agents/       # Custom Agents
+│       │   │   │   ├── tags/         # Tag Management (NEW)
 │       │   │   │   └── settings/     # Settings
 │       │   │   └── api/
 │       │   │       ├── generate/     # AI generation
 │       │   │       ├── prompts/      # Prompt CRUD
 │       │   │       ├── projects/     # Project CRUD
-│       │   │       └── agents/       # Custom Agents CRUD (NEW)
+│       │   │       ├── agents/       # Custom Agents CRUD
+│       │   │       └── tags/         # Tags CRUD (NEW)
 │       │   ├── components/
 │       │   │   ├── ui/               # shadcn/ui components
 │       │   │   ├── composer/         # Composer components
 │       │   │   ├── library/          # Library components
 │       │   │   ├── projects/         # Project components
-│       │   │   ├── agents/           # Agent components (NEW)
+│       │   │   ├── agents/           # Agent components
+│       │   │   ├── tags/             # Tag components (NEW)
 │       │   │   └── layout/           # Header, etc.
 │       │   ├── hooks/                # Custom hooks (NEW)
 │       │   └── lib/
@@ -306,13 +324,12 @@ Run all migrations in Supabase SQL Editor:
 
 ### Immediate Priorities
 
-1. **Tag Management UI** - Create/edit/delete tags, apply to prompts
-2. **Project Discovery** - Initial prompt + response parser
-3. **Project Selector** - Select project in composer for context injection
+1. **Project Discovery** - Initial prompt + response parser
+2. **Project Selector** - Select project in composer for context injection
+3. **Context Injection** - Auto-inject project context into prompts
 
 ### Phase 2 (Remaining)
 
-- [ ] Tag management UI with color picker
 - [ ] Project Discovery prompt copy
 - [ ] Agent response parser for auto-fill
 - [ ] Enable Smart Form mode
@@ -360,53 +377,66 @@ pnpm build
 
 | File | Purpose |
 |------|---------|
-| `apps/web/src/components/composer/composer.tsx` | Main composer with RTL |
-| `apps/web/src/app/app/library/page.tsx` | Prompt Library page |
+| `apps/web/src/components/composer/composer.tsx` | Main composer with RTL and tags |
+| `apps/web/src/components/composer/output-panel.tsx` | Output panel with tag selector |
+| `apps/web/src/app/app/library/page.tsx` | Prompt Library with tag filtering |
 | `apps/web/src/app/app/projects/page.tsx` | Projects list page |
-| `apps/web/src/app/app/agents/page.tsx` | Custom Agents page (NEW) |
-| `apps/web/src/components/agents/agent-card.tsx` | Agent card component (NEW) |
-| `apps/web/src/hooks/use-agent-options.ts` | Agent options hook (NEW) |
+| `apps/web/src/app/app/agents/page.tsx` | Custom Agents page |
+| `apps/web/src/app/app/tags/page.tsx` | Tag Management page (NEW) |
+| `apps/web/src/components/tags/tag-card.tsx` | Tag card component (NEW) |
+| `apps/web/src/components/tags/tag-form-dialog.tsx` | Tag form with color picker (NEW) |
+| `apps/web/src/components/library/tag-selector-dialog.tsx` | Tag selector for prompts (NEW) |
 | `apps/web/src/components/layout/header.tsx` | Header with navigation |
-| `packages/shared/src/constants/agent-dialects.ts` | Agent definitions |
-| `packages/shared/src/types/custom-agent.ts` | Custom agent types (NEW) |
+| `packages/shared/src/types/tag.ts` | Tag type definition (NEW) |
 
 ---
 
-## Session Summary (Jan 30, 2026 - Evening)
+## Session Summary (Jan 31, 2026)
 
 ### Completed This Session
+
+- [x] Implemented Tag Management UI with full CRUD
+- [x] Created /app/tags page with search, grid/list views
+- [x] Added TagCard and TagFormDialog UI components with color picker
+- [x] Added tag filtering to Prompt Library (multi-select)
+- [x] Display colored tag badges on prompt cards
+- [x] Added "Manage Tags" feature to apply/remove tags on prompts
+- [x] Added tag selection to Composer output panel
+- [x] Inline tag creation in Composer (create new tags without leaving page)
+- [x] Added Tags navigation link to header
+
+### Files Created
+
+- `packages/shared/src/types/tag.ts` - Tag type definition
+- `apps/web/src/app/api/tags/route.ts` - GET/POST endpoints
+- `apps/web/src/app/api/tags/[id]/route.ts` - GET/PATCH/DELETE endpoints
+- `apps/web/src/app/app/tags/page.tsx` - Tag management page
+- `apps/web/src/components/tags/tag-card.tsx` - Tag card component
+- `apps/web/src/components/tags/tag-form-dialog.tsx` - Tag form with color picker
+- `apps/web/src/components/library/tag-selector-dialog.tsx` - Tag selector dialog
+
+### Files Modified
+
+- `packages/shared/src/index.ts` - Export Tag type
+- `apps/web/src/components/layout/header.tsx` - Added Tags nav link
+- `apps/web/src/app/api/prompts/route.ts` - Added tags filtering and save support
+- `apps/web/src/components/library/library-filters.tsx` - Added tag filter dropdown
+- `apps/web/src/components/library/prompt-card.tsx` - Tag badges and manage tags menu
+- `apps/web/src/app/app/library/page.tsx` - Tag state and filtering
+- `apps/web/src/components/composer/output-panel.tsx` - Tag selector UI
+- `apps/web/src/components/composer/composer.tsx` - Tags state and save integration
+
+---
+
+## Previous Session (Jan 30, 2026 - Evening)
+
+### Completed
 
 - [x] Implemented Custom Agents feature with full CRUD
 - [x] Created /app/agents page with search, grid/list views
 - [x] Added AgentCard and AgentFormDialog UI components
-- [x] Created useAgentOptions hook for dropdown integration
 - [x] Integrated custom agents into Target Agent dropdown
-- [x] Updated prompt builder for custom agent dialect
 - [x] Added database migration 003 for custom_agents extension
-- [x] Added Agents navigation link to header
-
-### Files Created/Modified
-
-**New Files:**
-- `supabase/migrations/003_custom_agents_extension.sql`
-- `packages/shared/src/types/custom-agent.ts`
-- `apps/web/src/app/api/agents/route.ts`
-- `apps/web/src/app/api/agents/[id]/route.ts`
-- `apps/web/src/app/app/agents/page.tsx`
-- `apps/web/src/components/agents/agent-card.tsx`
-- `apps/web/src/components/agents/agent-form-dialog.tsx`
-- `apps/web/src/hooks/use-agent-options.ts`
-
-**Modified Files:**
-- `packages/shared/src/types/prompt.ts` - Added BuiltInAgentId, CustomAgentId types
-- `packages/shared/src/constants/agent-dialects.ts` - Added getCustomAgentDialectPrompt()
-- `packages/shared/src/constants/provider-guidelines/lookup.ts` - Updated for BuiltInAgentId
-- `packages/shared/src/validators/prompt-schema.ts` - Support custom agent validation
-- `packages/shared/src/index.ts` - Export new types
-- `apps/web/src/components/composer/options-bar.tsx` - Custom agents in dropdown
-- `apps/web/src/components/layout/header.tsx` - Added Agents nav link
-- `apps/web/src/lib/ai/prompt-builder.ts` - Custom agent dialect support
-- `apps/web/src/app/api/generate/route.ts` - Fetch custom agent for generation
 
 ---
 
