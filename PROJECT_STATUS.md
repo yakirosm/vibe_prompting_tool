@@ -4,13 +4,11 @@
 **Status:** Extended MVP - Major Features Implemented
 
 > **Latest Session (Jan 31, 2026):**
-> - Implemented Tag Management UI with full CRUD and color picker
-> - Created /app/tags page with search, grid/list views
-> - Added tag filtering to Prompt Library
-> - Display colored tag badges on prompt cards
-> - Added "Manage Tags" feature to apply tags to existing prompts
-> - Added tag selection to Composer for tagging new prompts
-> - Inline tag creation in Composer (create tags without leaving the page)
+> - **Tag Usage Count** - Tags display usage count ("X prompts")
+> - **Delete Warning** - Shows affected prompt count before deleting
+> - **Tag Sorting** - Sort by name, usage, or date (6 options)
+> - **Tag Search in Dropdowns** - Search filter when >5 tags exist
+> - **Bulk Tag Operations** - Select multiple prompts, add/remove tags at once
 
 ---
 
@@ -58,9 +56,12 @@
 | **Database migration v2** | ✅ Complete |
 | **Custom Agents (/app/agents)** | ✅ Complete |
 | **Database migration v3** | ✅ Complete |
-| **Tag Management (/app/tags)** | ✅ **NEW** |
-| **Tag-Prompt Integration** | ✅ **NEW** |
-| **Composer Tag Selection** | ✅ **NEW** |
+| **Tag Management (/app/tags)** | ✅ Complete |
+| **Tag-Prompt Integration** | ✅ Complete |
+| **Composer Tag Selection** | ✅ Complete |
+| **Tag Usage Count & Sorting** | ✅ **NEW** |
+| **Tag Search in Dropdowns** | ✅ **NEW** |
+| **Bulk Tag Operations** | ✅ **NEW** |
 
 ### Not Yet Implemented
 
@@ -113,16 +114,22 @@ A Next.js 15 application with:
 - **Actions** - Copy, favorite toggle, delete, manage tags
 - **Pagination** - Browse large collections
 - **Tag Badges** - Colored tags displayed on prompt cards
+- **Selection Mode** - Select multiple prompts for bulk operations
+- **Bulk Tag Operations** - Add/remove tags from multiple prompts at once
 
 ### 4. Tag Management (`/app/tags`)
 
 - **Tag List** - Card/list view with search
 - **Create/Edit Tags** - Name and color picker (10 preset colors)
-- **Delete Tags** - With confirmation dialog
+- **Delete Tags** - With confirmation dialog and usage warning
+- **Usage Count** - Display how many prompts use each tag
+- **Sorting** - Sort by name (A-Z/Z-A), usage (most/least), date (newest/oldest)
 - **Apply to Prompts** - Via Library "Manage Tags" or Composer
 - **Filter by Tags** - Multi-select tag filter in Library
 - **Composer Integration** - Add tags when creating prompts
 - **Inline Creation** - Create new tags without leaving Composer
+- **Search in Dropdowns** - Filter tags when many exist (>5 tags)
+- **Bulk Operations** - Select multiple prompts, add/remove tags at once
 
 ### 5. Project Management
 
@@ -169,10 +176,10 @@ prompt-ops-copilot/
 │       │   │   │   └── settings/     # Settings
 │       │   │   └── api/
 │       │   │       ├── generate/     # AI generation
-│       │   │       ├── prompts/      # Prompt CRUD
+│       │   │       ├── prompts/      # Prompt CRUD + bulk operations
 │       │   │       ├── projects/     # Project CRUD
 │       │   │       ├── agents/       # Custom Agents CRUD
-│       │   │       └── tags/         # Tags CRUD (NEW)
+│       │   │       └── tags/         # Tags CRUD
 │       │   ├── components/
 │       │   │   ├── ui/               # shadcn/ui components
 │       │   │   ├── composer/         # Composer components
@@ -378,22 +385,60 @@ pnpm build
 | File | Purpose |
 |------|---------|
 | `apps/web/src/components/composer/composer.tsx` | Main composer with RTL and tags |
-| `apps/web/src/components/composer/output-panel.tsx` | Output panel with tag selector |
-| `apps/web/src/app/app/library/page.tsx` | Prompt Library with tag filtering |
+| `apps/web/src/components/composer/output-panel.tsx` | Output panel with tag selector and search |
+| `apps/web/src/app/app/library/page.tsx` | Prompt Library with tag filtering and bulk operations |
 | `apps/web/src/app/app/projects/page.tsx` | Projects list page |
 | `apps/web/src/app/app/agents/page.tsx` | Custom Agents page |
-| `apps/web/src/app/app/tags/page.tsx` | Tag Management page (NEW) |
-| `apps/web/src/components/tags/tag-card.tsx` | Tag card component (NEW) |
-| `apps/web/src/components/tags/tag-form-dialog.tsx` | Tag form with color picker (NEW) |
-| `apps/web/src/components/library/tag-selector-dialog.tsx` | Tag selector for prompts (NEW) |
+| `apps/web/src/app/app/tags/page.tsx` | Tag Management with sorting |
+| `apps/web/src/components/tags/tag-card.tsx` | Tag card with usage count |
+| `apps/web/src/components/tags/tag-form-dialog.tsx` | Tag form with color picker |
+| `apps/web/src/components/library/tag-selector-dialog.tsx` | Tag selector with search |
+| `apps/web/src/components/library/bulk-action-bar.tsx` | Bulk selection action bar (NEW) |
+| `apps/web/src/components/library/bulk-tag-dialog.tsx` | Bulk tag operations dialog (NEW) |
+| `apps/web/src/app/api/prompts/bulk/route.ts` | Bulk tag update API (NEW) |
 | `apps/web/src/components/layout/header.tsx` | Header with navigation |
-| `packages/shared/src/types/tag.ts` | Tag type definition (NEW) |
+| `packages/shared/src/types/tag.ts` | Tag type with usage_count |
 
 ---
 
-## Session Summary (Jan 31, 2026)
+## Session Summary (Jan 31, 2026 - Continued)
 
-### Completed This Session
+### Completed This Session - Tag Features Completion
+
+- [x] **Tag Usage Count** - Tags display how many prompts use them
+- [x] **Delete Warning** - Shows affected prompt count before deletion
+- [x] **Tag Sorting** - 6 sort options (name A-Z/Z-A, usage most/least, date newest/oldest)
+- [x] **Tag Search in Dropdowns** - Filter tags in library filters, tag selector dialog, composer
+- [x] **Bulk Tag Operations** - Select multiple prompts, add/remove tags at once
+- [x] **Selection Mode** - Toggle selection mode in library with "Select" button
+- [x] **Bulk Action Bar** - Floating action bar when prompts are selected
+- [x] **Checkbox Component** - New shadcn/ui checkbox component
+
+### Files Created
+
+- `apps/web/src/components/ui/checkbox.tsx` - Checkbox UI component
+- `apps/web/src/app/api/prompts/bulk/route.ts` - Bulk tag update endpoint
+- `apps/web/src/components/library/bulk-action-bar.tsx` - Selection action bar
+- `apps/web/src/components/library/bulk-tag-dialog.tsx` - Bulk tag selector dialog
+
+### Files Modified
+
+- `packages/shared/src/types/tag.ts` - Added usage_count field
+- `apps/web/src/app/api/tags/route.ts` - Usage count calculation, sorting params
+- `apps/web/src/app/app/tags/page.tsx` - Sort dropdown, delete warning with usage
+- `apps/web/src/components/tags/tag-card.tsx` - Display usage count
+- `apps/web/src/components/library/library-filters.tsx` - Tag search in dropdown
+- `apps/web/src/components/library/tag-selector-dialog.tsx` - Tag search input
+- `apps/web/src/components/composer/output-panel.tsx` - Tag search in dropdown
+- `apps/web/src/components/library/prompt-card.tsx` - Selection checkbox
+- `apps/web/src/app/app/library/page.tsx` - Selection state, bulk operations
+- `apps/web/package.json` - Added @radix-ui/react-checkbox
+
+---
+
+## Previous Session (Jan 31, 2026 - Morning)
+
+### Completed - Tag Management Base
 
 - [x] Implemented Tag Management UI with full CRUD
 - [x] Created /app/tags page with search, grid/list views
@@ -404,27 +449,6 @@ pnpm build
 - [x] Added tag selection to Composer output panel
 - [x] Inline tag creation in Composer (create new tags without leaving page)
 - [x] Added Tags navigation link to header
-
-### Files Created
-
-- `packages/shared/src/types/tag.ts` - Tag type definition
-- `apps/web/src/app/api/tags/route.ts` - GET/POST endpoints
-- `apps/web/src/app/api/tags/[id]/route.ts` - GET/PATCH/DELETE endpoints
-- `apps/web/src/app/app/tags/page.tsx` - Tag management page
-- `apps/web/src/components/tags/tag-card.tsx` - Tag card component
-- `apps/web/src/components/tags/tag-form-dialog.tsx` - Tag form with color picker
-- `apps/web/src/components/library/tag-selector-dialog.tsx` - Tag selector dialog
-
-### Files Modified
-
-- `packages/shared/src/index.ts` - Export Tag type
-- `apps/web/src/components/layout/header.tsx` - Added Tags nav link
-- `apps/web/src/app/api/prompts/route.ts` - Added tags filtering and save support
-- `apps/web/src/components/library/library-filters.tsx` - Added tag filter dropdown
-- `apps/web/src/components/library/prompt-card.tsx` - Tag badges and manage tags menu
-- `apps/web/src/app/app/library/page.tsx` - Tag state and filtering
-- `apps/web/src/components/composer/output-panel.tsx` - Tag selector UI
-- `apps/web/src/components/composer/composer.tsx` - Tags state and save integration
 
 ---
 
