@@ -2,9 +2,11 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
-import { FileText } from 'lucide-react';
+import { FileText, CheckSquare } from 'lucide-react';
 import { PromptCard } from '@/components/library/prompt-card';
 import { TagSelectorDialog } from '@/components/library/tag-selector-dialog';
+import { BulkActionBar } from '@/components/library/bulk-action-bar';
+import { BulkTagDialog } from '@/components/library/bulk-tag-dialog';
 import { Spinner } from '@/components/ui/spinner';
 import {
   LibraryFiltersBar,
@@ -45,6 +47,9 @@ export default function LibraryPage() {
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
   const [managingTagsForPrompt, setManagingTagsForPrompt] = React.useState<Prompt | null>(null);
   const [viewMode, setViewMode] = React.useState<ViewMode>('grid');
+  const [isSelectionMode, setIsSelectionMode] = React.useState(false);
+  const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
+  const [bulkTagMode, setBulkTagMode] = React.useState<'add' | 'remove' | null>(null);
   const [filters, setFilters] = React.useState<LibraryFilters>({
     search: '',
     agent: '',
@@ -172,15 +177,55 @@ export default function LibraryPage() {
     );
   };
 
+  const handleSelectChange = (promptId: string, selected: boolean) => {
+    setSelectedIds((prev) => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(promptId);
+      } else {
+        newSet.delete(promptId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds(new Set());
+    setIsSelectionMode(false);
+  };
+
+  const handleBulkSuccess = () => {
+    setBulkTagMode(null);
+    handleClearSelection();
+    fetchPrompts();
+  };
+
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Prompt Library</h1>
-        <p className="text-muted-foreground">
-          {total} saved prompt{total !== 1 ? 's' : ''}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Prompt Library</h1>
+          <p className="text-muted-foreground">
+            {total} saved prompt{total !== 1 ? 's' : ''}
+          </p>
+        </div>
+        {prompts.length > 0 && (
+          <Button
+            variant={isSelectionMode ? 'secondary' : 'outline'}
+            size="sm"
+            onClick={() => {
+              setIsSelectionMode(!isSelectionMode);
+              if (isSelectionMode) {
+                setSelectedIds(new Set());
+              }
+            }}
+          >
+            <CheckSquare className="h-4 w-4 mr-2" />
+            {isSelectionMode ? 'Cancel Selection' : 'Select'}
+          </Button>
+        )}
       </div>
 
       <LibraryFiltersBar
@@ -224,6 +269,9 @@ export default function LibraryPage() {
                 onDelete={() => setDeleteId(prompt.id)}
                 onTagClick={handleTagClick}
                 onManageTags={() => setManagingTagsForPrompt(prompt)}
+                isSelectable={isSelectionMode}
+                isSelected={selectedIds.has(prompt.id)}
+                onSelectChange={(selected) => handleSelectChange(prompt.id, selected)}
               />
             ))}
           </div>
@@ -280,6 +328,24 @@ export default function LibraryPage() {
         prompt={managingTagsForPrompt}
         availableTags={tags}
         onSuccess={handleTagsUpdated}
+      />
+
+      {/* Bulk Action Bar */}
+      <BulkActionBar
+        selectedCount={selectedIds.size}
+        onAddTags={() => setBulkTagMode('add')}
+        onRemoveTags={() => setBulkTagMode('remove')}
+        onClearSelection={handleClearSelection}
+      />
+
+      {/* Bulk Tag Dialog */}
+      <BulkTagDialog
+        open={bulkTagMode !== null}
+        onOpenChange={(open) => { if (!open) setBulkTagMode(null); }}
+        mode={bulkTagMode || 'add'}
+        selectedPromptIds={Array.from(selectedIds)}
+        availableTags={tags}
+        onSuccess={handleBulkSuccess}
       />
     </div>
   );

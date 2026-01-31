@@ -5,6 +5,7 @@ import { Copy, Star, Trash2, MoreVertical, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Card,
   CardContent,
@@ -39,6 +40,9 @@ interface PromptCardProps {
   onDelete: () => void;
   onTagClick?: (tag: string) => void;
   onManageTags?: () => void;
+  isSelectable?: boolean;
+  isSelected?: boolean;
+  onSelectChange?: (selected: boolean) => void;
 }
 
 export function PromptCard({
@@ -49,6 +53,9 @@ export function PromptCard({
   onDelete,
   onTagClick,
   onManageTags,
+  isSelectable = false,
+  isSelected = false,
+  onSelectChange,
 }: PromptCardProps) {
   const getTagColor = (tagName: string): string => {
     const tag = availableTags.find((t) => t.name === tagName);
@@ -75,10 +82,20 @@ export function PromptCard({
   };
 
   return (
-    <Card className="flex flex-col h-full hover:shadow-md transition-shadow">
+    <Card className={cn(
+      'flex flex-col h-full hover:shadow-md transition-shadow',
+      isSelected && 'ring-2 ring-primary'
+    )}>
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 flex-wrap">
+            {isSelectable && (
+              <Checkbox
+                checked={isSelected}
+                onCheckedChange={(checked) => onSelectChange?.(!!checked)}
+                className="mr-1"
+              />
+            )}
             <Badge variant="outline">{prompt.agent_profile_id}</Badge>
             <Badge variant="secondary">{prompt.strategy}</Badge>
             <Badge variant="secondary">{prompt.variant_type}</Badge>
