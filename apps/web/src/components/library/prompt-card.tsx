@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Copy, Star, Trash2, MoreVertical } from 'lucide-react';
+import { Copy, Star, Trash2, MoreVertical, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import type { Tag as TagType } from '@prompt-ops/shared';
 
 interface PromptCardProps {
   prompt: {
@@ -32,19 +33,27 @@ interface PromptCardProps {
     is_favorite: boolean;
     created_at: string;
   };
+  availableTags: TagType[];
   onCopy: () => void;
   onToggleFavorite: () => void;
   onDelete: () => void;
   onTagClick?: (tag: string) => void;
+  onManageTags?: () => void;
 }
 
 export function PromptCard({
   prompt,
+  availableTags,
   onCopy,
   onToggleFavorite,
   onDelete,
   onTagClick,
+  onManageTags,
 }: PromptCardProps) {
+  const getTagColor = (tagName: string): string => {
+    const tag = availableTags.find((t) => t.name === tagName);
+    return tag?.color || '#6b7280'; // Default gray if tag not found
+  };
   const handleCopy = () => {
     navigator.clipboard.writeText(prompt.output_prompt);
     toast.success('Copied to clipboard');
@@ -99,6 +108,10 @@ export function PromptCard({
                   <Copy className="h-4 w-4 mr-2" />
                   Copy
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={onManageTags}>
+                  <Tag className="h-4 w-4 mr-2" />
+                  Manage Tags
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onDelete} className="text-destructive">
                   <Trash2 className="h-4 w-4 mr-2" />
@@ -125,16 +138,24 @@ export function PromptCard({
 
       <CardFooter className="pt-2 flex items-center justify-between border-t">
         <div className="flex items-center gap-1 flex-wrap">
-          {prompt.tags?.slice(0, 3).map((tag) => (
-            <Badge
-              key={tag}
-              variant="outline"
-              className="text-xs cursor-pointer hover:bg-accent"
-              onClick={() => onTagClick?.(tag)}
-            >
-              {tag}
-            </Badge>
-          ))}
+          {prompt.tags?.slice(0, 3).map((tag) => {
+            const tagColor = getTagColor(tag);
+            return (
+              <Badge
+                key={tag}
+                variant="outline"
+                className="text-xs cursor-pointer hover:opacity-80 transition-opacity"
+                style={{
+                  backgroundColor: `${tagColor}20`,
+                  borderColor: tagColor,
+                  borderLeftWidth: '3px',
+                }}
+                onClick={() => onTagClick?.(tag)}
+              >
+                {tag}
+              </Badge>
+            );
+          })}
           {prompt.tags && prompt.tags.length > 3 && (
             <Badge variant="outline" className="text-xs">
               +{prompt.tags.length - 3}

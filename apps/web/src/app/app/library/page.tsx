@@ -4,6 +4,7 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { FileText } from 'lucide-react';
 import { PromptCard } from '@/components/library/prompt-card';
+import { TagSelectorDialog } from '@/components/library/tag-selector-dialog';
 import { Spinner } from '@/components/ui/spinner';
 import {
   LibraryFiltersBar,
@@ -42,6 +43,7 @@ export default function LibraryPage() {
   const [total, setTotal] = React.useState(0);
   const [page, setPage] = React.useState(0);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
+  const [managingTagsForPrompt, setManagingTagsForPrompt] = React.useState<Prompt | null>(null);
   const [viewMode, setViewMode] = React.useState<ViewMode>('grid');
   const [filters, setFilters] = React.useState<LibraryFilters>({
     search: '',
@@ -162,6 +164,14 @@ export default function LibraryPage() {
     });
   };
 
+  const handleTagsUpdated = (promptId: string, newTags: string[]) => {
+    setPrompts((prev) =>
+      prev.map((p) =>
+        p.id === promptId ? { ...p, tags: newTags } : p
+      )
+    );
+  };
+
   const totalPages = Math.ceil(total / LIMIT);
 
   return (
@@ -208,10 +218,12 @@ export default function LibraryPage() {
               <PromptCard
                 key={prompt.id}
                 prompt={prompt}
+                availableTags={tags}
                 onCopy={() => {}}
                 onToggleFavorite={() => handleToggleFavorite(prompt.id)}
                 onDelete={() => setDeleteId(prompt.id)}
                 onTagClick={handleTagClick}
+                onManageTags={() => setManagingTagsForPrompt(prompt)}
               />
             ))}
           </div>
@@ -260,6 +272,15 @@ export default function LibraryPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Tag Selector Dialog */}
+      <TagSelectorDialog
+        open={!!managingTagsForPrompt}
+        onOpenChange={() => setManagingTagsForPrompt(null)}
+        prompt={managingTagsForPrompt}
+        availableTags={tags}
+        onSuccess={handleTagsUpdated}
+      />
     </div>
   );
 }
