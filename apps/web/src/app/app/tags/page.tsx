@@ -184,7 +184,19 @@ export default function TagsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Tag</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this tag? This action cannot be undone.
+              {(() => {
+                const tagToDelete = tags.find((t) => t.id === deleteId);
+                const usageCount = tagToDelete?.usage_count || 0;
+                if (usageCount > 0) {
+                  return (
+                    <>
+                      This tag is used by <strong>{usageCount} prompt{usageCount !== 1 ? 's' : ''}</strong>.
+                      Deleting it will remove the tag from those prompts. This action cannot be undone.
+                    </>
+                  );
+                }
+                return 'Are you sure you want to delete this tag? This action cannot be undone.';
+              })()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

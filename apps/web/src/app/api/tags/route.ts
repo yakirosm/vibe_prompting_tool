@@ -96,6 +96,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
+    const sortBy = searchParams.get('sortBy') || 'created_at';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     // Build query
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,9 +111,16 @@ export async function GET(request: NextRequest) {
       query = query.ilike('name', `%${search}%`);
     }
 
-    // Apply sorting
-    const { data, error, count } = await query
-      .order('created_at', { ascending: false });
+    // Apply sorting for non-usage sorts
+    if (sortBy !== 'usage') {
+      const ascending = sortOrder === 'asc';
+      query = query.order(sortBy, { ascending });
+    } else {
+      // For usage sort, we'll sort after calculating usage counts
+      query = query.order('created_at', { ascending: false });
+    }
+
+    const { data: tags, error, count } = await query;
 
     if (error) {
       console.error('Failed to fetch tags:', error);
@@ -121,7 +130,42 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ tags: data, total: count });
+    // Fetch prompts to calculate usage counts
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: prompts } = await (supabase as any)
+      .from('prompts')
+      .select('tags')
+      .eq('user_id', user.id)
+      .not('tags', 'is', null);
+
+    // Calculate usage counts for each tag
+    const usageCounts: Record<string, number> = {};
+    if (prompts) {
+      for (const prompt of prompts) {
+        if (Array.isArray(prompt.tags)) {
+          for (const tagName of prompt.tags) {
+            usageCounts[tagName] = (usageCounts[tagName] || 0) + 1;
+          }
+        }
+      }
+    }
+
+    // Add usage_count to each tag
+    const tagsWithUsage = tags.map((tag: { name: string }) => ({
+      ...tag,
+      usage_count: usageCounts[tag.name] || 0,
+    }));
+
+    // Sort by usage if requested
+    if (sortBy === 'usage') {
+      tagsWithUsage.sort((a: { usage_count: number }, b: { usage_count: number }) => {
+        return sortOrder === 'desc'
+          ? b.usage_count - a.usage_count
+          : a.usage_count - b.usage_count;
+      });
+    }
+
+    return NextResponse.json({ tags: tagsWithUsage, total: count });
   } catch (error) {
     console.error('Error fetching tags:', error);
     return NextResponse.json(

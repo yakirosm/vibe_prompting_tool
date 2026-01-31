@@ -81,9 +81,16 @@ export function TagCard({ tag, onEdit, onDelete }: TagCardProps) {
             {tag.color}
           </span>
         </div>
-        <p className="text-xs text-muted-foreground mt-3">
-          Created {formatDate(tag.created_at)}
-        </p>
+        <div className="flex items-center justify-between mt-3">
+          <p className="text-xs text-muted-foreground">
+            Created {formatDate(tag.created_at)}
+          </p>
+          {tag.usage_count !== undefined && (
+            <span className="text-xs text-muted-foreground">
+              {tag.usage_count} prompt{tag.usage_count !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

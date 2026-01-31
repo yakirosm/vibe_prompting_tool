@@ -4,4 +4,5 @@ export interface Tag {
   name: string;
   color: string;
   created_at: string;
+  usage_count?: number;
 }
