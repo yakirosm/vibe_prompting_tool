@@ -1,14 +1,36 @@
 'use client';
 
 import * as React from 'react';
-import { Copy, RotateCcw, Save, Check, Sparkles } from 'lucide-react';
+import { Copy, RotateCcw, Save, Check, Sparkles, Tag as TagIcon, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import type { GeneratedPrompt, PromptLength } from '@prompt-ops/shared';
+import { Input } from '@/components/ui/input';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import type { GeneratedPrompt, PromptLength, Tag } from '@prompt-ops/shared';
 import { formatPromptForCopy } from '@/lib/ai/prompt-builder';
 import { ClarifyingQuestionsForm } from './clarifying-questions-form';
+import { cn } from '@/lib/utils';
+
+const PRESET_COLORS = [
+  '#ef4444', // red
+  '#f97316', // orange
+  '#eab308', // yellow
+  '#22c55e', // green
+  '#14b8a6', // teal
+  '#3b82f6', // blue
+  '#6366f1', // indigo (default)
+  '#a855f7', // purple
+  '#ec4899', // pink
+  '#6b7280', // gray
+];
 
 interface OutputPanelProps {
   output: GeneratedPrompt | null;
@@ -21,6 +43,10 @@ interface OutputPanelProps {
   isLoading?: boolean;
   isAnswering?: boolean;
   isAuthenticated?: boolean;
+  availableTags?: Tag[];
+  selectedTags?: string[];
+  onTagsChange?: (tags: string[]) => void;
+  onCreateTag?: (name: string, color: string) => Promise<void>;
 }
 
 export function OutputPanel({
@@ -34,8 +60,46 @@ export function OutputPanel({
   isLoading,
   isAnswering = false,
   isAuthenticated = false,
+  availableTags = [],
+  selectedTags = [],
+  onTagsChange,
+  onCreateTag,
 }: OutputPanelProps) {
   const [copied, setCopied] = React.useState(false);
+  const [showCreateTag, setShowCreateTag] = React.useState(false);
+  const [newTagName, setNewTagName] = React.useState('');
+  const [newTagColor, setNewTagColor] = React.useState('#6366f1');
+  const [isCreatingTag, setIsCreatingTag] = React.useState(false);
+
+  const handleToggleTag = React.useCallback((tagName: string) => {
+    if (!onTagsChange) return;
+    if (selectedTags.includes(tagName)) {
+      onTagsChange(selectedTags.filter((t) => t !== tagName));
+    } else {
+      onTagsChange([...selectedTags, tagName]);
+    }
+  }, [selectedTags, onTagsChange]);
+
+  const handleCreateTag = React.useCallback(async () => {
+    if (!onCreateTag || !newTagName.trim()) return;
+
+    setIsCreatingTag(true);
+    try {
+      await onCreateTag(newTagName.trim(), newTagColor);
+      setNewTagName('');
+      setNewTagColor('#6366f1');
+      setShowCreateTag(false);
+    } catch {
+      toast.error('Failed to create tag');
+    } finally {
+      setIsCreatingTag(false);
+    }
+  }, [onCreateTag, newTagName, newTagColor]);
+
+  const handleRemoveTag = React.useCallback((tagName: string) => {
+    if (!onTagsChange) return;
+    onTagsChange(selectedTags.filter((t) => t !== tagName));
+  }, [selectedTags, onTagsChange]);
 
   const currentOutput = variants?.[activeVariant] || output;
   const hasQuestions = currentOutput?.clarifyingQuestions && currentOutput.clarifyingQuestions.length > 0;
@@ -118,7 +182,153 @@ export function OutputPanel({
         ) : null}
       </CardContent>
 
-      <CardFooter className="border-t px-4 py-3 flex justify-end gap-2">
+      <CardFooter className="border-t px-4 py-3 flex items-center gap-2">
+        {/* Tag selector - only show when authenticated and output exists */}
+        {isAuthenticated && output && onTagsChange && (
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {/* Selected tags display */}
+            <div className="flex items-center gap-1 flex-wrap">
+              {selectedTags.map((tagName) => {
+                const tag = availableTags.find((t) => t.name === tagName);
+                const color = tag?.color || '#6366f1';
+                return (
+                  <span
+                    key={tagName}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs border"
+                    style={{
+                      backgroundColor: `${color}15`,
+                      borderColor: `${color}40`,
+                      borderLeftWidth: '3px',
+                      borderLeftColor: color,
+                    }}
+                  >
+                    {tagName}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTag(tagName)}
+                      className="hover:opacity-70 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+
+            {/* Tag dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-muted-foreground hover:text-foreground"
+                  disabled={isLoading}
+                >
+                  <TagIcon className="h-4 w-4" />
+                  <span className="sr-only">Tags</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                {availableTags.length > 0 ? (
+                  <>
+                    {availableTags.map((tag) => (
+                      <DropdownMenuCheckboxItem
+                        key={tag.id}
+                        checked={selectedTags.includes(tag.name)}
+                        onCheckedChange={() => handleToggleTag(tag.name)}
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: tag.color }}
+                          />
+                          <span>{tag.name}</span>
+                        </div>
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                  </>
+                ) : (
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                    No tags yet
+                  </div>
+                )}
+
+                {/* Create new tag section */}
+                {showCreateTag ? (
+                  <div className="p-2 space-y-2">
+                    <Input
+                      placeholder="Tag name"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      className="h-8 text-sm"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleCreateTag();
+                        } else if (e.key === 'Escape') {
+                          setShowCreateTag(false);
+                          setNewTagName('');
+                        }
+                      }}
+                    />
+                    <div className="flex flex-wrap gap-1">
+                      {PRESET_COLORS.map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setNewTagColor(color)}
+                          className={cn(
+                            'h-5 w-5 rounded-full transition-all',
+                            'hover:scale-110 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-primary',
+                            newTagColor === color && 'ring-1 ring-offset-1 ring-primary'
+                          )}
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        className="h-7 flex-1"
+                        onClick={handleCreateTag}
+                        disabled={!newTagName.trim() || isCreatingTag}
+                      >
+                        {isCreatingTag ? 'Creating...' : 'Create'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7"
+                        onClick={() => {
+                          setShowCreateTag(false);
+                          setNewTagName('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateTag(true)}
+                    className="flex w-full items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-sm transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Create new tag
+                  </button>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
+        {/* Spacer when no tags section */}
+        {!(isAuthenticated && output && onTagsChange) && <div className="flex-1" />}
+
         <Button
           variant="ghost"
           size="sm"
