@@ -7,6 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { TagCard } from '@/components/tags/tag-card';
 import { TagFormDialog } from '@/components/tags/tag-form-dialog';
 import {
@@ -22,11 +29,13 @@ import {
 import type { Tag as TagType } from '@prompt-ops/shared';
 
 type ViewMode = 'grid' | 'list';
+type SortOption = 'created_at-desc' | 'created_at-asc' | 'name-asc' | 'name-desc' | 'usage-desc' | 'usage-asc';
 
 export default function TagsPage() {
   const [tags, setTags] = React.useState<TagType[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
+  const [sortOption, setSortOption] = React.useState<SortOption>('created_at-desc');
   const [viewMode, setViewMode] = React.useState<ViewMode>('grid');
   const [showDialog, setShowDialog] = React.useState(false);
   const [editTag, setEditTag] = React.useState<TagType | null>(null);
@@ -35,8 +44,11 @@ export default function TagsPage() {
   const fetchTags = React.useCallback(async () => {
     setIsLoading(true);
     try {
+      const [sortBy, sortOrder] = sortOption.split('-') as [string, string];
       const params = new URLSearchParams();
       if (search) params.set('search', search);
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
 
       const response = await fetch(`/api/tags?${params}`);
       if (!response.ok) throw new Error('Failed to fetch tags');
@@ -48,7 +60,7 @@ export default function TagsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [search]);
+  }, [search, sortOption]);
 
   React.useEffect(() => {
     fetchTags();
@@ -104,7 +116,7 @@ export default function TagsPage() {
         </Button>
       </div>
 
-      {/* Search and View Mode */}
+      {/* Search, Sort, and View Mode */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -115,6 +127,19 @@ export default function TagsPage() {
             className="pl-9"
           />
         </div>
+        <Select value={sortOption} onValueChange={(v) => setSortOption(v as SortOption)}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="created_at-desc">Newest first</SelectItem>
+            <SelectItem value="created_at-asc">Oldest first</SelectItem>
+            <SelectItem value="name-asc">Name A-Z</SelectItem>
+            <SelectItem value="name-desc">Name Z-A</SelectItem>
+            <SelectItem value="usage-desc">Most used</SelectItem>
+            <SelectItem value="usage-asc">Least used</SelectItem>
+          </SelectContent>
+        </Select>
         <div className="flex items-center gap-1 border rounded-md p-1">
           <Toggle
             pressed={viewMode === 'grid'}
