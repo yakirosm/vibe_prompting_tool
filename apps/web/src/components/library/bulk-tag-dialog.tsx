@@ -117,12 +117,12 @@ export function BulkTagDialog({
             <>
               {availableTags.length > 5 && (
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search tags..."
                     value={tagSearch}
                     onChange={(e) => setTagSearch(e.target.value)}
-                    className="pl-9"
+                    className="ps-9"
                   />
                 </div>
               )}

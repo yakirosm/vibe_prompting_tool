@@ -28,7 +28,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {showCharCount && (
           <div
             className={cn(
-              'absolute bottom-3 right-3 px-2 py-1 rounded-md text-xs font-medium transition-colors',
+              'absolute bottom-3 end-3 px-2 py-1 rounded-md text-xs font-medium transition-colors',
               'bg-muted/80 backdrop-blur-sm border shadow-sm',
               isAtLimit && 'bg-destructive/10 text-destructive border-destructive/20',
               isNearLimit && !isAtLimit && 'bg-warning/10 text-warning-foreground border-warning/20',

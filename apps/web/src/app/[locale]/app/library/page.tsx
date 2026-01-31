@@ -222,7 +222,7 @@ export default function LibraryPage() {
               }
             }}
           >
-            <CheckSquare className="h-4 w-4 mr-2" />
+            <CheckSquare className="h-4 w-4 me-2" />
             {isSelectionMode ? 'Cancel Selection' : 'Select'}
           </Button>
         )}

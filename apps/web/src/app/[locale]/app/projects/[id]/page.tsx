@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowLeft, Pencil, Copy, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ProjectFormDialog } from '@/components/projects/project-form-dialog';
+import { Link, useRouter } from '@/i18n/navigation';
 
 interface Project {
   id: string;
@@ -151,7 +151,7 @@ export default function ProjectDetailPage() {
           )}
         </div>
         <Button variant="outline" onClick={() => setShowEditDialog(true)}>
-          <Pencil className="h-4 w-4 mr-2" />
+          <Pencil className="h-4 w-4 me-2" />
           Edit
         </Button>
       </div>
@@ -166,7 +166,7 @@ export default function ProjectDetailPage() {
                 <CardTitle className="text-lg">Context Pack</CardTitle>
                 {project.context_pack && (
                   <Button variant="ghost" size="sm" onClick={copyContextPack}>
-                    <Copy className="h-4 w-4 mr-2" />
+                    <Copy className="h-4 w-4 me-2" />
                     Copy
                   </Button>
                 )}
@@ -177,7 +177,7 @@ export default function ProjectDetailPage() {
             </CardHeader>
             <CardContent>
               {project.context_pack ? (
-                <pre className="text-sm bg-muted/50 p-4 rounded-md whitespace-pre-wrap font-mono">
+                <pre className="text-sm bg-muted/50 p-4 rounded-md whitespace-pre-wrap font-mono" dir="ltr">
                   {project.context_pack}
                 </pre>
               ) : (

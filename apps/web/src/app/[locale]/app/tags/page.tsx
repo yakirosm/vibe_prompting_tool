@@ -111,7 +111,7 @@ export default function TagsPage() {
           </p>
         </div>
         <Button onClick={() => { setEditTag(null); setShowDialog(true); }}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4 me-2" />
           New Tag
         </Button>
       </div>
@@ -119,12 +119,12 @@ export default function TagsPage() {
       {/* Search, Sort, and View Mode */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search tags..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <Select value={sortOption} onValueChange={(v) => setSortOption(v as SortOption)}>
@@ -172,7 +172,7 @@ export default function TagsPage() {
             Create tags to organize your prompts.
           </p>
           <Button className="mt-4" onClick={() => { setEditTag(null); setShowDialog(true); }}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             Create your first tag
           </Button>
         </div>

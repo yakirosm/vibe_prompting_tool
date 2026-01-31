@@ -134,6 +134,11 @@
 }
 
 @layer utilities {
+  /* RTL icon flip utility */
+  [dir="rtl"] .rtl-flip {
+    transform: scaleX(-1);
+  }
+
   /* Custom scrollbar */
   .scrollbar-thin {
     scrollbar-width: thin;

@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { Sparkles, Copy, Check, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslations, useLocale } from 'next-intl';
+import { Sparkles, Copy, Check, Lightbulb, ChevronDown, ChevronUp, ArrowLeftRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,6 +58,10 @@ interface ComposerProps {
 }
 
 export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
+  const t = useTranslations('composer');
+  const tToast = useTranslations('toast');
+  const locale = useLocale();
+
   // Input state
   const [input, setInput] = React.useState('');
   const [agent, setAgent] = React.useState<AgentId>('cursor');
@@ -89,12 +94,20 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
   const [selectedPromptTags, setSelectedPromptTags] = React.useState<string[]>([]);
   const [availableTags, setAvailableTags] = React.useState<Tag[]>([]);
 
-  // Language detection for RTL support
+  // Layout direction toggle state
+  const [layoutReversed, setLayoutReversed] = React.useState(false);
+
+  // Language detection for RTL text support (used for textarea direction)
   const detectedLanguage = React.useMemo<InputLanguage>(() => {
     if (!input || input.length < 10) return 'en';
     return detectInputLanguage(input);
   }, [input]);
-  const isRTL = detectedLanguage === 'he';
+  const isTextRTL = detectedLanguage === 'he';
+
+  // Layout direction based on locale with manual toggle
+  // Hebrew locale = RTL layout by default, English locale = LTR layout by default
+  // Toggle reverses the default
+  const isLayoutRTL = locale === 'he' ? !layoutReversed : layoutReversed;
 
   // Platform detection for keyboard shortcut display
   const [isMac, setIsMac] = React.useState(true); // Default to Mac symbol
@@ -235,7 +248,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
       const data = await response.json();
       setOutput(data.prompt);
       setActiveVariant(length);
-      toast.success('Prompt generated');
+      toast.success(tToast('success.generated'));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to generate prompt');
     } finally {
@@ -258,9 +271,9 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
           generatedPrompt: output,
           tags: selectedPromptTags.length > 0 ? selectedPromptTags : undefined,
         });
-        toast.success('Prompt saved');
+        toast.success(tToast('success.saved'));
       } catch {
-        toast.error('Failed to save prompt');
+        toast.error(tToast('error.saveFailed'));
       }
     }
   }, [output, onSave, input, agent, length, strategy, selectedPromptTags]);
@@ -311,9 +324,9 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
 
       const data = await response.json();
       setOutput(data.prompt);
-      toast.success('Prompt updated with your answers');
+      toast.success(tToast('success.updated'));
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to update prompt');
+      toast.error(error instanceof Error ? error.message : tToast('error.generic'));
     } finally {
       setIsAnswering(false);
     }
@@ -333,12 +346,12 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
     try {
       await navigator.clipboard.writeText(DISCOVERY_PROMPT);
       setDiscoveryCopied(true);
-      toast.success('Discovery prompt copied! Paste it in your AI coding assistant.');
+      toast.success(t('welcome.discoveryPromptToast'));
       setTimeout(() => setDiscoveryCopied(false), 3000);
     } catch {
-      toast.error('Failed to copy');
+      toast.error(tToast('error.copyFailed'));
     }
-  }, []);
+  }, [t, tToast]);
 
   // Welcome card for new users
   const WelcomeCard = showWelcome && !output && (
@@ -349,7 +362,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
             <div className="p-2 rounded-lg bg-primary/10">
               <Lightbulb className="h-4 w-4 text-primary" />
             </div>
-            <CardTitle className="text-base">New to this project?</CardTitle>
+            <CardTitle className="text-base">{t('welcome.title')}</CardTitle>
           </div>
           <Button
             variant="ghost"
@@ -363,7 +376,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
       </CardHeader>
       <CardContent className="pt-0">
         <p className="text-sm text-muted-foreground mb-3">
-          Start by sending this discovery prompt to your AI assistant. It will help you understand your codebase and provide context for better prompts.
+          {t('welcome.description')}
         </p>
         <div className="bg-background/80 rounded-lg p-3 text-xs font-mono text-muted-foreground max-h-32 overflow-auto mb-3 border">
           {DISCOVERY_PROMPT.slice(0, 200)}...
@@ -376,13 +389,13 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
         >
           {discoveryCopied ? (
             <>
-              <Check className="h-4 w-4 mr-2 text-success" />
-              Copied! Now paste in your AI assistant
+              <Check className="h-4 w-4 me-2 text-success" />
+              {t('welcome.discoveryPromptCopied')}
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Discovery Prompt
+              <Copy className="h-4 w-4 me-2" />
+              {t('welcome.copyDiscoveryPrompt')}
             </>
           )}
         </Button>
@@ -398,8 +411,8 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
       onClick={() => setShowWelcome(true)}
       className="text-xs text-muted-foreground hover:text-foreground transition-colors"
     >
-      <Lightbulb className="h-3 w-3 mr-1" />
-      Show discovery prompt
+      <Lightbulb className="h-3 w-3 me-1" />
+      {t('welcome.showDiscovery')}
     </Button>
   );
 
@@ -410,7 +423,7 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
       {CollapsedWelcome}
 
       <div className="flex-1 min-h-0 flex flex-col">
-        <InputPanel value={input} onChange={setInput} disabled={isLoading} isRTL={isRTL} />
+        <InputPanel value={input} onChange={setInput} disabled={isLoading} isRTL={isTextRTL} />
       </div>
 
       <ProjectContextPanel
@@ -452,22 +465,12 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
           loading={isLoading}
           className="w-full transition-all hover:scale-[1.01] active:scale-[0.99]"
         >
-          <Sparkles className="h-4 w-4 mr-2" />
-          {isRTL ? 'צור פרומפט' : 'Generate Prompt'}
+          <Sparkles className="h-4 w-4 me-2" />
+          {t('actions.generate')}
         </Button>
 
         <p className="text-xs text-muted-foreground text-center">
-          {isRTL ? (
-            <>
-              לחץ <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">{modifierKey}</kbd>+
-              <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">Enter</kbd> ליצירה
-            </>
-          ) : (
-            <>
-              Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">{modifierKey}</kbd>+
-              <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-sans">Enter</kbd> to generate
-            </>
-          )}
+          {t('keyboard.pressToGenerate', { modifier: modifierKey })}
         </p>
       </div>
     </div>
@@ -496,16 +499,29 @@ export function Composer({ isAuthenticated = false, onSave }: ComposerProps) {
 
   return (
     <div className="h-full" onKeyDown={handleKeyDown}>
+      {/* Layout toggle button */}
+      <div className="flex justify-center mb-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setLayoutReversed((prev) => !prev)}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors gap-1.5"
+          title={t('actions.switchLayout')}
+        >
+          <ArrowLeftRight className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">{t('actions.switchLayout')}</span>
+        </Button>
+      </div>
       <div className="grid lg:grid-cols-2 gap-6 h-full">
-        {isRTL ? (
+        {isLayoutRTL ? (
           <>
-            {/* RTL: Output on LEFT, Input on RIGHT */}
+            {/* RTL Layout: Output on LEFT, Input on RIGHT */}
             {OutputSide}
             {InputSide}
           </>
         ) : (
           <>
-            {/* LTR: Input on LEFT, Output on RIGHT */}
+            {/* LTR Layout: Input on LEFT, Output on RIGHT */}
             {InputSide}
             {OutputSide}
           </>

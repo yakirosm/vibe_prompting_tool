@@ -97,12 +97,12 @@ export function LibraryFiltersBar({
       {/* Search and View Mode */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search prompts..."
             value={filters.search}
             onChange={(e) => updateFilter('search', e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <div className="flex items-center gap-1 border rounded-md p-1">
@@ -240,7 +240,7 @@ export function LibraryFiltersBar({
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
-            <X className="h-4 w-4 mr-1" />
+            <X className="h-4 w-4 me-1" />
             Clear filters
           </Button>
         )}

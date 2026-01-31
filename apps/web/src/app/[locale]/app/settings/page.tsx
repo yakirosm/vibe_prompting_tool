@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { LogOut, Save, Key, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { createClient } from '@/lib/supabase/client';
+import { useRouter } from '@/i18n/navigation';
 import {
   PROVIDER_LABELS,
   DEFAULT_MODELS,
@@ -156,13 +156,13 @@ export default function SettingsPage() {
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder={`Enter your ${PROVIDER_LABELS[provider]} API key`}
-                className="pr-10"
+                className="pe-10"
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                className="absolute end-0 top-0 h-full px-3 hover:bg-transparent"
                 onClick={() => setShowApiKey(!showApiKey)}
                 aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
               >
@@ -190,7 +190,7 @@ export default function SettingsPage() {
         </CardContent>
         <CardFooter>
           <Button onClick={handleSave} disabled={isLoading} loading={isLoading}>
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="h-4 w-4 me-2" />
             Save Settings
           </Button>
         </CardFooter>
@@ -204,7 +204,7 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent>
           <Button variant="outline" onClick={handleSignOut}>
-            <LogOut className="h-4 w-4 mr-2" />
+            <LogOut className="h-4 w-4 me-2" />
             Sign Out
           </Button>
         </CardContent>

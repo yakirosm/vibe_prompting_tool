@@ -216,7 +216,7 @@ export function ClarifyingQuestionsForm({
                 <p className="text-sm font-medium leading-relaxed">{question}</p>
               </div>
 
-              <div className="ml-9 space-y-2">
+              <div className="ms-9 space-y-2">
                 {/* Predefined options */}
                 {!isCustomMode && (
                   <div className="space-y-2">
@@ -227,7 +227,7 @@ export function ClarifyingQuestionsForm({
                         onClick={() => handleOptionSelect(qIndex, oIndex)}
                         disabled={isSubmitting}
                         className={cn(
-                          'w-full text-left px-3 py-2 rounded-md text-sm transition-all',
+                          'w-full text-start px-3 py-2 rounded-md text-sm transition-all',
                           'border hover:border-primary/50 hover:bg-primary/5',
                           answer.selectedOption === oIndex
                             ? 'border-primary bg-primary/10 text-primary font-medium'
@@ -280,7 +280,7 @@ export function ClarifyingQuestionsForm({
                   disabled={isSubmitting}
                   className="text-xs text-muted-foreground hover:text-foreground mt-1"
                 >
-                  <Pencil className="w-3 h-3 mr-1" />
+                  <Pencil className="w-3 h-3 me-1" />
                   {isCustomMode ? 'Use predefined answers' : 'Write custom answer'}
                 </Button>
               </div>

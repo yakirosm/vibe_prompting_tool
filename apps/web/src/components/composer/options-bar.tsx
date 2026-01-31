@@ -1,11 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { HelpCircle, Bot, Settings2 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -25,7 +24,6 @@ import {
 } from '@/components/ui/tooltip';
 import { type PromptLength, type PromptStrategy, type AgentId } from '@prompt-ops/shared';
 import { useAgentOptions } from '@/hooks/use-agent-options';
-import { cn } from '@/lib/utils';
 
 interface OptionsBarProps {
   agent: AgentId;
@@ -50,6 +48,8 @@ export function OptionsBar({
   onAskClarifyingQuestionsChange,
   disabled,
 }: OptionsBarProps) {
+  const t = useTranslations('composer.options');
+  const tOutput = useTranslations('composer.output.tabs');
   const { allAgentOptions } = useAgentOptions();
 
   // Separate built-in and custom agents
@@ -62,7 +62,7 @@ export function OptionsBar({
         {/* Agent Selector */}
         <div className="space-y-2">
           <Label htmlFor="agent-select" className="text-sm font-medium">
-            Target Agent
+            {t('targetAgent')}
           </Label>
           <Select
             value={agent}
@@ -70,11 +70,11 @@ export function OptionsBar({
             disabled={disabled}
           >
             <SelectTrigger id="agent-select" className="transition-colors">
-              <SelectValue placeholder="Select agent" />
+              <SelectValue placeholder={t('selectAgent')} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>Built-in Agents</SelectLabel>
+                <SelectLabel>{t('builtInAgents')}</SelectLabel>
                 {builtInAgents.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -85,7 +85,7 @@ export function OptionsBar({
                 <>
                   <SelectSeparator />
                   <SelectGroup>
-                    <SelectLabel>Custom Agents</SelectLabel>
+                    <SelectLabel>{t('customAgents')}</SelectLabel>
                     {customAgents.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export function OptionsBar({
                   className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Settings2 className="h-3 w-3" />
-                  Manage Agents
+                  {t('manageAgents')}
                 </Link>
               </div>
             </SelectContent>
@@ -113,7 +113,7 @@ export function OptionsBar({
 
         {/* Length Toggle */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Output Length</Label>
+          <Label className="text-sm font-medium">{t('outputLength')}</Label>
           <ToggleGroup
             type="single"
             value={length}
@@ -123,14 +123,14 @@ export function OptionsBar({
             disabled={disabled}
             className="justify-start"
           >
-            <ToggleGroupItem value="short" aria-label="Short" className="text-xs transition-all">
-              Short
+            <ToggleGroupItem value="short" aria-label={tOutput('short')} className="text-xs transition-all">
+              {tOutput('short')}
             </ToggleGroupItem>
-            <ToggleGroupItem value="standard" aria-label="Standard" className="text-xs transition-all">
-              Standard
+            <ToggleGroupItem value="standard" aria-label={tOutput('standard')} className="text-xs transition-all">
+              {tOutput('standard')}
             </ToggleGroupItem>
-            <ToggleGroupItem value="detailed" aria-label="Detailed" className="text-xs transition-all">
-              Detailed
+            <ToggleGroupItem value="detailed" aria-label={tOutput('detailed')} className="text-xs transition-all">
+              {tOutput('detailed')}
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
@@ -139,7 +139,7 @@ export function OptionsBar({
       <div className="grid gap-4 sm:grid-cols-2">
         {/* Strategy Toggle */}
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Strategy</Label>
+          <Label className="text-sm font-medium">{t('strategy')}</Label>
           <ToggleGroup
             type="single"
             value={strategy}
@@ -149,11 +149,11 @@ export function OptionsBar({
             disabled={disabled}
             className="justify-start"
           >
-            <ToggleGroupItem value="implement" aria-label="Implement" className="text-xs transition-all">
-              Implement
+            <ToggleGroupItem value="implement" aria-label={t('implement')} className="text-xs transition-all">
+              {t('implement')}
             </ToggleGroupItem>
-            <ToggleGroupItem value="diagnose" aria-label="Diagnose" className="text-xs transition-all">
-              Diagnose
+            <ToggleGroupItem value="diagnose" aria-label={t('diagnose')} className="text-xs transition-all">
+              {t('diagnose')}
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
@@ -161,7 +161,7 @@ export function OptionsBar({
         {/* Clarifying Questions Toggle */}
         <div className="space-y-2">
           <div className="flex items-center gap-1">
-            <Label className="text-sm font-medium">Questions Mode</Label>
+            <Label className="text-sm font-medium">{t('questionsMode')}</Label>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -169,39 +169,36 @@ export function OptionsBar({
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-[250px]">
                   <p className="text-xs">
-                    When enabled, the generated prompt will include 2-4 clarifying questions to help the AI better understand your needs before implementing.
+                    {t('clarifyingQuestionsTooltip')}
                   </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
-          <div
-            className={cn(
-              'flex items-center gap-3 p-2 rounded-md transition-all',
-              askClarifyingQuestions && 'bg-primary/10 border border-primary/20'
-            )}
+          <ToggleGroup
+            type="single"
+            value={askClarifyingQuestions ? 'on' : 'off'}
+            onValueChange={(value) => {
+              if (value) onAskClarifyingQuestionsChange(value === 'on');
+            }}
+            disabled={disabled}
+            className="justify-start"
           >
-            <Switch
-              id="clarifying-questions"
-              checked={askClarifyingQuestions}
-              onCheckedChange={onAskClarifyingQuestionsChange}
-              disabled={disabled}
-            />
-            <Label
-              htmlFor="clarifying-questions"
-              className={cn(
-                'text-sm cursor-pointer transition-colors',
-                askClarifyingQuestions && 'text-primary font-medium'
-              )}
+            <ToggleGroupItem
+              value="off"
+              aria-label={t('off')}
+              className="text-xs transition-all"
             >
-              Include clarifying questions
-            </Label>
-            {askClarifyingQuestions && (
-              <Badge variant="secondary" className="text-xs animate-fade-in">
-                ON
-              </Badge>
-            )}
-          </div>
+              {t('off')}
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="on"
+              aria-label={t('on')}
+              className="text-xs transition-all"
+            >
+              {t('on')}
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
       </div>
     </div>

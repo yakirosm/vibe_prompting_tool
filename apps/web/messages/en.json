@@ -1,0 +1,460 @@
+{
+  "metadata": {
+    "title": "Prompt Ops Copilot - Transform Issues into Agent-Ready Prompts",
+    "description": "Convert amateur development issues into professional prompts"
+  },
+  "common": {
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "generate": "Generate",
+      "regenerate": "Regenerate",
+      "close": "Close",
+      "confirm": "Confirm",
+      "create": "Create",
+      "add": "Add",
+      "remove": "Remove",
+      "search": "Search",
+      "clear": "Clear",
+      "apply": "Apply",
+      "reset": "Reset",
+      "back": "Back",
+      "next": "Next",
+      "loading": "Loading...",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All"
+    },
+    "language": {
+      "switchLanguage": "Switch language",
+      "en": "English",
+      "he": "עברית"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "success": "Success",
+      "error": "Error"
+    }
+  },
+  "header": {
+    "nav": {
+      "library": "Prompt Library",
+      "projects": "Projects",
+      "agents": "Custom Agents",
+      "tags": "Tags",
+      "tweaks": "Custom Tweaks",
+      "settings": "Settings"
+    },
+    "auth": {
+      "signIn": "Log in",
+      "signOut": "Sign Out",
+      "getStarted": "Get Started"
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "Transform your prompts",
+      "subtitle": "Turn messy issues into agent-ready prompts optimized for AI coding tools",
+      "cta": "Start Creating",
+      "secondaryCta": "Learn More"
+    },
+    "features": {
+      "smartTransformation": {
+        "title": "Smart Transformation",
+        "description": "AI-powered conversion of rough ideas into structured prompts"
+      },
+      "hebrewSupport": {
+        "title": "Hebrew Support",
+        "description": "Write in Hebrew, get professional English prompts"
+      },
+      "agentOptimized": {
+        "title": "Agent-Optimized",
+        "description": "Tailored for Cursor, Lovable, Replit, and more"
+      }
+    }
+  },
+  "composer": {
+    "input": {
+      "title": "Describe your issue",
+      "placeholder": "Describe your coding issue, feature request, or bug...\n\nYou can write in Hebrew or English. The output will always be in English.",
+      "characterCount": "{count} characters",
+      "detected": "detected"
+    },
+    "output": {
+      "title": "Generated Prompt",
+      "emptyTitle": "Your generated prompt will appear here",
+      "emptyDescription": "Enter your issue and click Generate",
+      "tabs": {
+        "short": "Short",
+        "standard": "Standard",
+        "detailed": "Detailed"
+      },
+      "sections": {
+        "goal": "Goal",
+        "context": "Context",
+        "requirements": "Requirements",
+        "acceptanceCriteria": "Acceptance Criteria",
+        "constraints": "Constraints",
+        "technicalNotes": "Technical Notes"
+      },
+      "searchTags": "Search tags...",
+      "noMatchingTags": "No matching tags",
+      "noTagsYet": "No tags yet",
+      "tagName": "Tag name",
+      "createNewTag": "Create new tag",
+      "creating": "Creating..."
+    },
+    "options": {
+      "targetAgent": "Target Agent",
+      "builtInAgents": "Built-in Agents",
+      "customAgents": "Custom Agents",
+      "project": "Project",
+      "selectProject": "Select project",
+      "noProject": "No project",
+      "tags": "Tags",
+      "selectTags": "Select tags",
+      "noTags": "No tags selected",
+      "tweaks": "Tweaks",
+      "selectTweaks": "Select tweaks",
+      "outputLength": "Output Length",
+      "strategy": "Strategy",
+      "implement": "Implement",
+      "diagnose": "Diagnose",
+      "questionsMode": "Questions Mode",
+      "clarifyingQuestions": "Include clarifying questions",
+      "clarifyingQuestionsTooltip": "When enabled, the generated prompt will include 2-4 clarifying questions to help the AI better understand your needs before implementing.",
+      "selectAgent": "Select agent",
+      "manageAgents": "Manage Agents",
+      "on": "On",
+      "off": "Off"
+    },
+    "actions": {
+      "generate": "Generate Prompt",
+      "generating": "Generating...",
+      "regenerate": "Regenerate",
+      "copy": "Copy to Clipboard",
+      "save": "Save to Library",
+      "saved": "Saved!",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "switchLayout": "Switch Layout"
+    },
+    "welcome": {
+      "title": "New to this project?",
+      "description": "Start by sending this discovery prompt to your AI assistant. It will help you understand your codebase and provide context for better prompts.",
+      "showDiscovery": "Show discovery prompt",
+      "copyDiscoveryPrompt": "Copy Discovery Prompt",
+      "discoveryPromptCopied": "Copied! Now paste in your AI assistant",
+      "discoveryPromptToast": "Discovery prompt copied! Paste it in your AI coding assistant."
+    },
+    "keyboard": {
+      "pressToGenerate": "Press {modifier}+Enter to generate"
+    },
+    "projectContext": {
+      "title": "Project Context",
+      "active": "Active",
+      "description": "Add context about your project to generate more relevant prompts. This context will be included in every generated prompt.",
+      "manual": "Manual",
+      "form": "Form",
+      "pasteResponse": "Paste AI Response",
+      "chat": "Chat",
+      "projectName": "Project Name",
+      "techStack": "Tech Stack",
+      "codingConventions": "Coding Conventions",
+      "applyFormData": "Apply Form Data",
+      "clearContext": "Clear Context",
+      "createProject": "Create Project",
+      "chatComingSoon": "Chat mode coming soon",
+      "chatDescription": "Have a conversation to build context",
+      "pasteDescription": "Paste the response from the discovery prompt to automatically extract project context.",
+      "parseAndApply": "Parse & Apply Context",
+      "parsing": "Parsing...",
+      "manualPlaceholder": "Describe your project context, tech stack, conventions, and any other relevant details...",
+      "projectNamePlaceholder": "My Awesome App",
+      "techStackPlaceholder": "Next.js, TypeScript, Tailwind, Supabase",
+      "descriptionPlaceholder": "Brief description of what the project does...",
+      "conventionsPlaceholder": "Use functional components, prefer composition over inheritance...",
+      "pastePlaceholder": "Paste the AI's response about your project here..."
+    },
+    "promptTweaks": {
+      "title": "Prompt Tweaks",
+      "active": "active",
+      "suggestedCount": "{count} suggested tweaks based on your input",
+      "view": "View",
+      "aiSuggested": "Tweaks with sparkle icons are AI-suggested based on your input",
+      "thinkingMode": "Thinking Mode",
+      "skills": "Skills",
+      "behaviors": "Behaviors",
+      "customTweaks": "Custom Tweaks",
+      "manage": "Manage",
+      "loading": "Loading...",
+      "createFirst": "Create your first custom tweak",
+      "estimatedTokenImpact": "Estimated token impact:",
+      "tokenCost": "Token cost:",
+      "conflictsWithSelected": "Conflicts with selected behavior"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your account to continue",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submit": "Sign In",
+      "googleButton": "Continue with Google",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "forgotPassword": "Forgot password?",
+      "orContinueWith": "Or continue with email"
+    },
+    "signup": {
+      "title": "Create an account",
+      "subtitle": "Get started with Prompt Ops Copilot",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Create a password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "submit": "Sign Up",
+      "googleButton": "Sign up with Google",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "termsText": "By signing up, you agree to our",
+      "termsLink": "Terms of Service",
+      "privacyLink": "Privacy Policy",
+      "orContinueWith": "Or continue with email",
+      "checkEmail": "Check your email to confirm your account"
+    }
+  },
+  "library": {
+    "title": "Prompt Library",
+    "subtitle": "Browse and manage your saved prompts",
+    "filters": {
+      "search": "Search prompts...",
+      "agent": "Agent",
+      "allAgents": "All Agents",
+      "project": "Project",
+      "allProjects": "All Projects",
+      "dateRange": "Date Range",
+      "tags": "Tags",
+      "allTags": "All Tags"
+    },
+    "sort": {
+      "label": "Sort by",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "alphabetical": "Alphabetical"
+    },
+    "empty": {
+      "title": "No prompts yet",
+      "description": "Generate your first prompt to see it here",
+      "cta": "Create Prompt"
+    },
+    "card": {
+      "viewDetails": "View Details",
+      "copyPrompt": "Copy Prompt",
+      "delete": "Delete",
+      "createdAt": "Created {date}",
+      "usedWith": "Used with {agent}"
+    },
+    "bulkActions": {
+      "selected": "{count} selected",
+      "delete": "Delete Selected",
+      "addTags": "Add Tags",
+      "removeTags": "Remove Tags",
+      "confirmDelete": "Are you sure you want to delete {count} prompts?"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Organize your prompts by project",
+    "create": "New Project",
+    "edit": "Edit Project",
+    "delete": "Delete Project",
+    "form": {
+      "name": "Project Name",
+      "namePlaceholder": "Enter project name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your project",
+      "contextPack": "Context Pack",
+      "contextPackPlaceholder": "Add context that will be included with prompts",
+      "contextPackHelp": "This context will be automatically included when generating prompts for this project"
+    },
+    "empty": {
+      "title": "No projects yet",
+      "description": "Create your first project to organize your prompts",
+      "cta": "Create Project"
+    },
+    "card": {
+      "promptCount": "{count} prompts",
+      "lastUpdated": "Last updated {date}",
+      "viewProject": "View Project"
+    },
+    "confirmDelete": "Are you sure you want to delete this project? All associated prompts will be unlinked."
+  },
+  "agents": {
+    "title": "Custom Agents",
+    "subtitle": "Create custom agent profiles for specialized prompt generation",
+    "create": "New Agent",
+    "edit": "Edit Agent",
+    "delete": "Delete Agent",
+    "form": {
+      "name": "Agent Name",
+      "namePlaceholder": "Enter agent name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe what this agent specializes in",
+      "systemPrompt": "System Prompt",
+      "systemPromptPlaceholder": "Define the agent's behavior and guidelines",
+      "icon": "Icon",
+      "color": "Color"
+    },
+    "empty": {
+      "title": "No custom agents yet",
+      "description": "Create your first custom agent to tailor prompt generation",
+      "cta": "Create Agent"
+    },
+    "confirmDelete": "Are you sure you want to delete this agent?"
+  },
+  "tags": {
+    "title": "Tags",
+    "subtitle": "Manage tags for organizing your prompts",
+    "create": "New Tag",
+    "edit": "Edit Tag",
+    "delete": "Delete Tag",
+    "form": {
+      "name": "Tag Name",
+      "namePlaceholder": "Enter tag name",
+      "color": "Color",
+      "selectColor": "Select a color"
+    },
+    "empty": {
+      "title": "No tags yet",
+      "description": "Create tags to categorize your prompts",
+      "cta": "Create Tag"
+    },
+    "confirmDelete": "Are you sure you want to delete this tag?",
+    "bulkActions": {
+      "selected": "{count} selected",
+      "delete": "Delete Selected",
+      "confirmDelete": "Are you sure you want to delete {count} tags?"
+    }
+  },
+  "tweaks": {
+    "title": "Custom Tweaks",
+    "subtitle": "Create reusable prompt modifications",
+    "create": "New Tweak",
+    "edit": "Edit Tweak",
+    "delete": "Delete Tweak",
+    "form": {
+      "name": "Tweak Name",
+      "namePlaceholder": "Enter tweak name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe what this tweak does",
+      "content": "Tweak Content",
+      "contentPlaceholder": "Enter the content to append to prompts"
+    },
+    "empty": {
+      "title": "No tweaks yet",
+      "description": "Create tweaks to customize your prompt generation",
+      "cta": "Create Tweak"
+    },
+    "confirmDelete": "Are you sure you want to delete this tweak?"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and preferences",
+    "sections": {
+      "provider": "AI Provider",
+      "appearance": "Appearance",
+      "language": "Language",
+      "account": "Account",
+      "danger": "Danger Zone"
+    },
+    "provider": {
+      "title": "AI Provider",
+      "description": "Configure your preferred AI provider",
+      "select": "Select Provider",
+      "apiKey": "API Key",
+      "apiKeyPlaceholder": "Enter your API key",
+      "apiKeyHelp": "Your API key is stored securely and never shared",
+      "model": "Model",
+      "selectModel": "Select model",
+      "testConnection": "Test Connection",
+      "connectionSuccess": "Connection successful!",
+      "connectionError": "Connection failed. Please check your API key."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize the look and feel",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System"
+    },
+    "language": {
+      "title": "Language",
+      "description": "Choose your preferred language",
+      "select": "Select Language"
+    },
+    "account": {
+      "title": "Account",
+      "description": "Manage your account settings",
+      "email": "Email",
+      "changePassword": "Change Password",
+      "deleteAccount": "Delete Account"
+    },
+    "danger": {
+      "title": "Danger Zone",
+      "description": "Irreversible and destructive actions",
+      "deleteAccount": "Delete Account",
+      "deleteAccountWarning": "This will permanently delete your account and all associated data.",
+      "confirmDelete": "Type DELETE to confirm"
+    }
+  },
+  "validation": {
+    "required": "{field} is required",
+    "email": "Please enter a valid email",
+    "minLength": "{field} must be at least {min} characters",
+    "maxLength": "{field} must be at most {max} characters",
+    "passwordMatch": "Passwords do not match",
+    "invalidApiKey": "Invalid API key format"
+  },
+  "toast": {
+    "success": {
+      "saved": "Saved successfully",
+      "copied": "Copied to clipboard",
+      "deleted": "Deleted successfully",
+      "created": "Created successfully",
+      "updated": "Updated successfully",
+      "generated": "Prompt generated successfully"
+    },
+    "error": {
+      "generic": "Something went wrong",
+      "saveFailed": "Failed to save",
+      "loadFailed": "Failed to load data",
+      "deleteFailed": "Failed to delete",
+      "generateFailed": "Failed to generate prompt",
+      "copyFailed": "Failed to copy to clipboard",
+      "networkError": "Network error. Please check your connection.",
+      "unauthorized": "Please sign in to continue"
+    }
+  },
+  "aria": {
+    "menu": "Menu",
+    "navigation": "Main navigation",
+    "userMenu": "User menu",
+    "languageMenu": "Language selection",
+    "themeToggle": "Toggle theme",
+    "closeDialog": "Close dialog",
+    "expandSection": "Expand section",
+    "collapseSection": "Collapse section"
+  }
+}

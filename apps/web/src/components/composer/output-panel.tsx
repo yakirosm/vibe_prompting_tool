@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { Copy, RotateCcw, Save, Check, Sparkles, Tag as TagIcon, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -65,6 +66,10 @@ export function OutputPanel({
   onTagsChange,
   onCreateTag,
 }: OutputPanelProps) {
+  const t = useTranslations('composer');
+  const tToast = useTranslations('toast');
+  const tCommon = useTranslations('common.actions');
+
   const [copied, setCopied] = React.useState(false);
   const [showCreateTag, setShowCreateTag] = React.useState(false);
   const [newTagName, setNewTagName] = React.useState('');
@@ -98,11 +103,11 @@ export function OutputPanel({
       setNewTagColor('#6366f1');
       setShowCreateTag(false);
     } catch {
-      toast.error('Failed to create tag');
+      toast.error(tToast('error.generic'));
     } finally {
       setIsCreatingTag(false);
     }
-  }, [onCreateTag, newTagName, newTagColor]);
+  }, [onCreateTag, newTagName, newTagColor, tToast]);
 
   const handleRemoveTag = React.useCallback((tagName: string) => {
     if (!onTagsChange) return;
@@ -120,12 +125,12 @@ export function OutputPanel({
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      toast.success('Copied to clipboard');
+      toast.success(tToast('success.copied'));
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      toast.error('Failed to copy');
+      toast.error(tToast('error.copyFailed'));
     }
-  }, [currentOutput]);
+  }, [currentOutput, tToast]);
 
   if (!currentOutput && !isLoading) {
     return (
@@ -134,8 +139,8 @@ export function OutputPanel({
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-muted mb-4">
             <Sparkles className="h-6 w-6 text-muted-foreground" />
           </div>
-          <p className="font-medium">Your generated prompt will appear here</p>
-          <p className="text-sm mt-1">Enter your issue and click Generate</p>
+          <p className="font-medium">{t('output.emptyTitle')}</p>
+          <p className="text-sm mt-1">{t('output.emptyDescription')}</p>
         </CardContent>
       </Card>
     );
@@ -147,13 +152,13 @@ export function OutputPanel({
         <Tabs value={activeVariant} onValueChange={(v) => onVariantChange(v as PromptLength)}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="short" disabled={isLoading} className="transition-all">
-              Short
+              {t('output.tabs.short')}
             </TabsTrigger>
             <TabsTrigger value="standard" disabled={isLoading} className="transition-all">
-              Standard
+              {t('output.tabs.standard')}
             </TabsTrigger>
             <TabsTrigger value="detailed" disabled={isLoading} className="transition-all">
-              Detailed
+              {t('output.tabs.detailed')}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -240,7 +245,7 @@ export function OutputPanel({
                 {availableTags.length > 5 && (
                   <div className="px-2 pb-2">
                     <Input
-                      placeholder="Search tags..."
+                      placeholder={t('output.searchTags')}
                       value={tagSearch}
                       onChange={(e) => setTagSearch(e.target.value)}
                       className="h-8 text-sm"
@@ -253,7 +258,7 @@ export function OutputPanel({
                   <>
                     {filteredTags.length === 0 ? (
                       <div className="px-2 py-2 text-sm text-muted-foreground text-center">
-                        No matching tags
+                        {t('output.noMatchingTags')}
                       </div>
                     ) : (
                       filteredTags.map((tag) => (
@@ -277,7 +282,7 @@ export function OutputPanel({
                   </>
                 ) : (
                   <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                    No tags yet
+                    {t('output.noTagsYet')}
                   </div>
                 )}
 
@@ -285,7 +290,7 @@ export function OutputPanel({
                 {showCreateTag ? (
                   <div className="p-2 space-y-2">
                     <Input
-                      placeholder="Tag name"
+                      placeholder={t('output.tagName')}
                       value={newTagName}
                       onChange={(e) => setNewTagName(e.target.value)}
                       className="h-8 text-sm"
@@ -322,7 +327,7 @@ export function OutputPanel({
                         onClick={handleCreateTag}
                         disabled={!newTagName.trim() || isCreatingTag}
                       >
-                        {isCreatingTag ? 'Creating...' : 'Create'}
+                        {isCreatingTag ? t('output.creating') : tCommon('create')}
                       </Button>
                       <Button
                         size="sm"
@@ -333,7 +338,7 @@ export function OutputPanel({
                           setNewTagName('');
                         }}
                       >
-                        Cancel
+                        {tCommon('cancel')}
                       </Button>
                     </div>
                   </div>
@@ -344,7 +349,7 @@ export function OutputPanel({
                     className="flex w-full items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-sm transition-colors"
                   >
                     <Plus className="h-4 w-4" />
-                    Create new tag
+                    {t('output.createNewTag')}
                   </button>
                 )}
               </DropdownMenuContent>
@@ -362,8 +367,8 @@ export function OutputPanel({
           disabled={isLoading || !output}
           className="transition-all hover:bg-muted"
         >
-          <RotateCcw className="h-4 w-4 mr-1" />
-          Regenerate
+          <RotateCcw className="h-4 w-4 me-1" />
+          {t('actions.regenerate')}
         </Button>
         {isAuthenticated && (
           <Button
@@ -373,8 +378,8 @@ export function OutputPanel({
             disabled={isLoading || !output}
             className="transition-all"
           >
-            <Save className="h-4 w-4 mr-1" />
-            Save
+            <Save className="h-4 w-4 me-1" />
+            {tCommon('save')}
           </Button>
         )}
         <Button
@@ -386,13 +391,13 @@ export function OutputPanel({
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4 mr-1 text-success" />
-              Copied
+              <Check className="h-4 w-4 me-1 text-success" />
+              {tCommon('copied')}
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4 mr-1" />
-              Copy
+              <Copy className="h-4 w-4 me-1" />
+              {tCommon('copy')}
             </>
           )}
         </Button>

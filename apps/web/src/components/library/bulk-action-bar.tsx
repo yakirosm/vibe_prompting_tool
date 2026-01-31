@@ -26,11 +26,11 @@ export function BulkActionBar({
       </span>
       <div className="flex items-center gap-2">
         <Button size="sm" variant="outline" onClick={onAddTags}>
-          <Tag className="h-4 w-4 mr-2" />
+          <Tag className="h-4 w-4 me-2" />
           Add Tags
         </Button>
         <Button size="sm" variant="outline" onClick={onRemoveTags}>
-          <Tag className="h-4 w-4 mr-2" />
+          <Tag className="h-4 w-4 me-2" />
           Remove Tags
         </Button>
         <Button size="sm" variant="ghost" onClick={onClearSelection}>

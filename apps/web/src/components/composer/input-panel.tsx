@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +16,8 @@ interface InputPanelProps {
 }
 
 export function InputPanel({ value, onChange, disabled, isRTL = false }: InputPanelProps) {
+  const t = useTranslations('composer.input');
+
   const detectedLanguage = React.useMemo(() => {
     if (!value || value.length < 10) return null;
     return detectInputLanguage(value);
@@ -24,11 +27,11 @@ export function InputPanel({ value, onChange, disabled, isRTL = false }: InputPa
     <Card className={`flex flex-col flex-1 overflow-hidden ${isRTL ? 'text-right' : ''}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="flex items-center justify-between px-4 py-3">
         <Label htmlFor="input-textarea" className="text-sm font-medium">
-          {isRTL ? 'תאר את הבעיה שלך' : 'Describe your issue'}
+          {t('title')}
         </Label>
         {detectedLanguage && (
           <Badge variant="secondary" className="text-xs animate-fade-in">
-            {getLanguageDisplayName(detectedLanguage)} detected
+            {getLanguageDisplayName(detectedLanguage)} {t('detected')}
           </Badge>
         )}
       </div>
@@ -37,9 +40,7 @@ export function InputPanel({ value, onChange, disabled, isRTL = false }: InputPa
           id="input-textarea"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={isRTL
-            ? "תאר את הבעיה, הבקשה לפיצ'ר, או הבאג...\n\nאפשר לכתוב בעברית או באנגלית. הפלט תמיד יהיה באנגלית."
-            : "Describe your coding issue, feature request, or bug...\n\nYou can write in Hebrew or English. The output will always be in English."}
+          placeholder={t('placeholder')}
           className={`h-full min-h-[200px] border-0 rounded-none shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 ${isRTL ? 'text-right' : ''}`}
           dir={isRTL ? 'rtl' : 'ltr'}
           showCharCount

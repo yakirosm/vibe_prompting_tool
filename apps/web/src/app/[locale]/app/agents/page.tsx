@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
-import { Plus, FolderKanban, Search, LayoutGrid, List } from 'lucide-react';
+import { Plus, Bot, Search, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
-import { ProjectCard } from '@/components/projects/project-card';
-import { ProjectFormDialog } from '@/components/projects/project-form-dialog';
+import { AgentCard } from '@/components/agents/agent-card';
+import { AgentFormDialog } from '@/components/agents/agent-form-dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,85 +19,73 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-
-interface Project {
-  id: string;
-  name: string;
-  description: string | null;
-  stack_summary: string | null;
-  context_pack: string | null;
-  default_agent: string | null;
-  default_mode: string | null;
-  development_log: string[] | null;
-  created_at: string;
-  updated_at: string;
-}
+import type { CustomAgent } from '@prompt-ops/shared';
 
 type ViewMode = 'grid' | 'list';
 
-export default function ProjectsPage() {
-  const [projects, setProjects] = React.useState<Project[]>([]);
+export default function AgentsPage() {
+  const [agents, setAgents] = React.useState<CustomAgent[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
   const [viewMode, setViewMode] = React.useState<ViewMode>('grid');
   const [showDialog, setShowDialog] = React.useState(false);
-  const [editProject, setEditProject] = React.useState<Project | null>(null);
+  const [editAgent, setEditAgent] = React.useState<CustomAgent | null>(null);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
 
-  const fetchProjects = React.useCallback(async () => {
+  const fetchAgents = React.useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
 
-      const response = await fetch(`/api/projects?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch projects');
+      const response = await fetch(`/api/agents?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch agents');
 
       const data = await response.json();
-      setProjects(data.projects || []);
+      setAgents(data.agents || []);
     } catch {
-      toast.error('Failed to load projects');
+      toast.error('Failed to load custom agents');
     } finally {
       setIsLoading(false);
     }
   }, [search]);
 
   React.useEffect(() => {
-    fetchProjects();
-  }, [fetchProjects]);
+    fetchAgents();
+  }, [fetchAgents]);
 
   const handleDelete = async () => {
     if (!deleteId) return;
 
     try {
-      const response = await fetch(`/api/projects/${deleteId}`, {
+      const response = await fetch(`/api/agents/${deleteId}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) throw new Error('Failed to delete');
 
-      setProjects((prev) => prev.filter((p) => p.id !== deleteId));
-      toast.success('Project deleted');
+      setAgents((prev) => prev.filter((a) => a.id !== deleteId));
+      toast.success('Agent deleted');
     } catch {
-      toast.error('Failed to delete project');
+      toast.error('Failed to delete agent');
     } finally {
       setDeleteId(null);
     }
   };
 
-  const handleSuccess = (project: Project) => {
-    if (editProject) {
-      setProjects((prev) =>
-        prev.map((p) => (p.id === project.id ? project : p))
+  const handleSuccess = (agent: CustomAgent) => {
+    if (editAgent) {
+      setAgents((prev) =>
+        prev.map((a) => (a.id === agent.id ? agent : a))
       );
     } else {
-      setProjects((prev) => [project, ...prev]);
+      setAgents((prev) => [agent, ...prev]);
     }
-    setEditProject(null);
+    setEditAgent(null);
   };
 
-  const handleEdit = (project: Project) => {
-    setEditProject(project);
+  const handleEdit = (agent: CustomAgent) => {
+    setEditAgent(agent);
     setShowDialog(true);
   };
 
@@ -105,26 +93,26 @@ export default function ProjectsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Projects</h1>
+          <h1 className="text-2xl font-bold">Custom Agents</h1>
           <p className="text-muted-foreground">
-            {projects.length} project{projects.length !== 1 ? 's' : ''}
+            {agents.length} agent{agents.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button onClick={() => { setEditProject(null); setShowDialog(true); }}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Project
+        <Button onClick={() => { setEditAgent(null); setShowDialog(true); }}>
+          <Plus className="h-4 w-4 me-2" />
+          New Agent
         </Button>
       </div>
 
       {/* Search and View Mode */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search projects..."
+            placeholder="Search agents..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <div className="flex items-center gap-1 border rounded-md p-1">
@@ -151,16 +139,16 @@ export default function ProjectsPage() {
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" variant="muted" />
         </div>
-      ) : projects.length === 0 ? (
+      ) : agents.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <FolderKanban className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">No projects yet</h3>
+          <Bot className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium">No custom agents yet</h3>
           <p className="text-muted-foreground mt-1">
-            Create a project to organize your prompts and context.
+            Create a custom agent to personalize your prompt generation.
           </p>
-          <Button className="mt-4" onClick={() => { setEditProject(null); setShowDialog(true); }}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create your first project
+          <Button className="mt-4" onClick={() => { setEditAgent(null); setShowDialog(true); }}>
+            <Plus className="h-4 w-4 me-2" />
+            Create your first agent
           </Button>
         </div>
       ) : (
@@ -171,22 +159,22 @@ export default function ProjectsPage() {
               : 'flex flex-col gap-4'
           }
         >
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onEdit={() => handleEdit(project)}
-              onDelete={() => setDeleteId(project.id)}
+          {agents.map((agent) => (
+            <AgentCard
+              key={agent.id}
+              agent={agent}
+              onEdit={() => handleEdit(agent)}
+              onDelete={() => setDeleteId(agent.id)}
             />
           ))}
         </div>
       )}
 
-      {/* Project Form Dialog */}
-      <ProjectFormDialog
+      {/* Agent Form Dialog */}
+      <AgentFormDialog
         open={showDialog}
         onOpenChange={setShowDialog}
-        project={editProject}
+        agent={editAgent}
         onSuccess={handleSuccess}
       />
 
@@ -194,10 +182,9 @@ export default function ProjectsPage() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Project</AlertDialogTitle>
+            <AlertDialogTitle>Delete Agent</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this project? This will not delete associated prompts,
-              but they will no longer be linked to this project.
+              Are you sure you want to delete this custom agent? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

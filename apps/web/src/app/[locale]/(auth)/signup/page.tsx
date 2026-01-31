@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,24 +10,40 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Spinner } from '@/components/ui/spinner';
 import { createClient } from '@/lib/supabase/client';
+import { Link, useRouter } from '@/i18n/navigation';
 
-function LoginForm() {
+function SignupForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') || '/app';
+  const t = useTranslations('auth.signup');
+  const tValidation = useTranslations('validation');
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      toast.error(tValidation('passwordMatch'));
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error(tValidation('minLength', { field: t('password'), min: 8 }));
+      return;
+    }
+
     setIsLoading(true);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
 
     if (error) {
@@ -37,18 +52,18 @@ function LoginForm() {
       return;
     }
 
-    toast.success('Welcome back!');
-    router.push(redirectTo);
+    toast.success(t('checkEmail'));
+    router.push('/login');
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleSignup = async () => {
     setIsLoading(true);
     const supabase = createClient();
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${redirectTo}`,
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
@@ -66,17 +81,17 @@ function LoginForm() {
             <Sparkles className="h-5 w-5 text-primary-foreground" />
           </div>
         </Link>
-        <CardTitle className="text-2xl">Welcome back</CardTitle>
-        <CardDescription>Sign in to your account to continue</CardDescription>
+        <CardTitle className="text-2xl">{t('title')}</CardTitle>
+        <CardDescription>{t('subtitle')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
           variant="outline"
           className="w-full"
-          onClick={handleGoogleLogin}
+          onClick={handleGoogleSignup}
           disabled={isLoading}
         >
-          <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+          <svg className="me-2 h-4 w-4" viewBox="0 0 24 24">
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               fill="#4285F4"
@@ -94,7 +109,7 @@ function LoginForm() {
               fill="#EA4335"
             />
           </svg>
-          Continue with Google
+          {t('googleButton')}
         </Button>
 
         <div className="relative">
@@ -102,17 +117,17 @@ function LoginForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">Or continue with email</span>
+            <span className="bg-card px-2 text-muted-foreground">{t('orContinueWith')}</span>
           </div>
         </div>
 
-        <form onSubmit={handleEmailLogin} className="space-y-4">
+        <form onSubmit={handleEmailSignup} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -120,35 +135,59 @@ function LoginForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('password')}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder={t('passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isLoading}
+              minLength={8}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-password">{t('confirmPassword')}</Label>
+            <Input
+              id="confirm-password"
+              type="password"
+              placeholder={t('confirmPasswordPlaceholder')}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={isLoading}
             />
           </div>
           <Button type="submit" className="w-full" disabled={isLoading} loading={isLoading}>
-            Sign In
+            {t('submit')}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col gap-2 text-center text-sm text-muted-foreground">
         <p>
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-primary hover:underline">
-            Sign up
+          {t('hasAccount')}{' '}
+          <Link href="/login" className="text-primary hover:underline">
+            {t('signInLink')}
           </Link>
+        </p>
+        <p className="text-xs">
+          {t('termsText')}{' '}
+          <Link href="/terms" className="text-primary hover:underline">
+            {t('termsLink')}
+          </Link>{' '}
+          &{' '}
+          <Link href="/privacy" className="text-primary hover:underline">
+            {t('privacyLink')}
+          </Link>
+          .
         </p>
       </CardFooter>
     </Card>
   );
 }
 
-export default function LoginPage() {
+export default function SignupPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
       <React.Suspense
@@ -160,7 +199,7 @@ export default function LoginPage() {
           </Card>
         }
       >
-        <LoginForm />
+        <SignupForm />
       </React.Suspense>
     </div>
   );

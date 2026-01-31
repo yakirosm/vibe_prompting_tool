@@ -42,7 +42,7 @@ export function LinterHints({ suggestions, onDismiss, onAddField }: LinterHintsP
                 className="h-auto p-0 text-xs mt-1"
                 onClick={() => onAddField(suggestion.field!)}
               >
-                <Plus className="h-3 w-3 mr-1" />
+                <Plus className="h-3 w-3 me-1" />
                 Add {suggestion.field}
               </Button>
             )}

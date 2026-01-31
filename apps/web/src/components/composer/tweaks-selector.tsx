@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ChevronDown, ChevronUp, Lightbulb, Sparkles, Plus, Settings2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +43,8 @@ export function TweaksSelector({
   onTweaksChange,
   disabled,
 }: TweaksSelectorProps) {
+  const t = useTranslations('composer.promptTweaks');
+
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [customTweaks, setCustomTweaks] = React.useState<CustomTweak[]>([]);
   const [isLoadingCustom, setIsLoadingCustom] = React.useState(false);
@@ -173,11 +176,11 @@ export function TweaksSelector({
                 <p className="font-medium">{tweak.label}</p>
                 <p className="text-xs text-muted-foreground">{tweak.description}</p>
                 <p className={cn('text-xs font-mono', TOKEN_COST_COLORS[tweak.tokenCost])}>
-                  Token cost: {TOKEN_COST_LABELS[tweak.tokenCost]}
+                  {t('tokenCost')} {TOKEN_COST_LABELS[tweak.tokenCost]}
                 </p>
                 {isDisabledByConflict && (
                   <p className="text-xs text-destructive">
-                    Conflicts with selected behavior
+                    {t('conflictsWithSelected')}
                   </p>
                 )}
               </div>
@@ -271,16 +274,16 @@ export function TweaksSelector({
         onClick={() => setIsExpanded(!isExpanded)}
         disabled={disabled}
         className={cn(
-          'w-full flex items-center justify-between p-4 text-left transition-colors',
+          'w-full flex items-center justify-between p-4 text-start transition-colors',
           'hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
       >
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Prompt Tweaks</span>
+          <span className="text-sm font-medium">{t('title')}</span>
           {activeCount > 0 && (
             <Badge variant="secondary" className="text-xs">
-              {activeCount} active
+              {activeCount} {t('active')}
             </Badge>
           )}
         </div>
@@ -308,10 +311,9 @@ export function TweaksSelector({
             >
               <Lightbulb className="h-3.5 w-3.5" />
               <span>
-                {suggestions.length} suggested tweak{suggestions.length !== 1 && 's'} based on your
-                input
+                {t('suggestedCount', { count: suggestions.length })}
               </span>
-              <span className="ml-auto text-amber-600 dark:text-amber-400">View</span>
+              <span className="ms-auto text-amber-600 dark:text-amber-400">{t('view')}</span>
             </button>
           )}
 
@@ -337,9 +339,7 @@ export function TweaksSelector({
             <div className="flex items-center gap-2 pt-3 text-xs text-muted-foreground">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
               <span>
-                Tweaks with{' '}
-                <span className="text-amber-500 font-medium">sparkle icons</span> are
-                AI-suggested based on your input
+                {t('aiSuggested')}
               </span>
             </div>
           )}
@@ -347,7 +347,7 @@ export function TweaksSelector({
           {/* Thinking Modes Section */}
           <div className="space-y-2 pt-2">
             <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Thinking Mode
+              {t('thinkingMode')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {THINKING_TWEAKS.map((tweak) =>
@@ -364,7 +364,7 @@ export function TweaksSelector({
           {/* Skills Section */}
           <div className="space-y-2">
             <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Skills
+              {t('skills')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {SKILL_TWEAKS.map((tweak) =>
@@ -381,7 +381,7 @@ export function TweaksSelector({
           {/* Behaviors Section */}
           <div className="space-y-2">
             <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Behaviors
+              {t('behaviors')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {BEHAVIOR_TWEAKS.map((tweak) =>
@@ -399,18 +399,18 @@ export function TweaksSelector({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Custom Tweaks
+                {t('customTweaks')}
               </h4>
               <Link
                 href="/app/tweaks"
                 className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
                 <Settings2 className="h-3 w-3" />
-                Manage
+                {t('manage')}
               </Link>
             </div>
             {isLoadingCustom ? (
-              <p className="text-xs text-muted-foreground">Loading...</p>
+              <p className="text-xs text-muted-foreground">{t('loading')}</p>
             ) : customTweaks.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {customTweaks.map((tweak) =>
@@ -426,7 +426,7 @@ export function TweaksSelector({
                 className="flex items-center gap-2 p-2 rounded-md border border-dashed text-xs text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
               >
                 <Plus className="h-3.5 w-3.5" />
-                <span>Create your first custom tweak</span>
+                <span>{t('createFirst')}</span>
               </Link>
             )}
           </div>
@@ -434,7 +434,7 @@ export function TweaksSelector({
           {/* Token Impact Summary */}
           {activeCount > 0 && (
             <div className="pt-2 flex items-center justify-between text-xs text-muted-foreground border-t">
-              <span>Estimated token impact:</span>
+              <span>{t('estimatedTokenImpact')}</span>
               <span
                 className={cn(
                   'font-mono',

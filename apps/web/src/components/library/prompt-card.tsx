@@ -93,7 +93,7 @@ export function PromptCard({
               <Checkbox
                 checked={isSelected}
                 onCheckedChange={(checked) => onSelectChange?.(!!checked)}
-                className="mr-1"
+                className="me-1"
               />
             )}
             <Badge variant="outline">{prompt.agent_profile_id}</Badge>
@@ -122,16 +122,16 @@ export function PromptCard({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={handleCopy}>
-                  <Copy className="h-4 w-4 mr-2" />
+                  <Copy className="h-4 w-4 me-2" />
                   Copy
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onManageTags}>
-                  <Tag className="h-4 w-4 mr-2" />
+                  <Tag className="h-4 w-4 me-2" />
                   Manage Tags
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <Trash2 className="h-4 w-4 me-2" />
                   Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>

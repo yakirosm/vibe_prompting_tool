@@ -1,0 +1,460 @@
+{
+  "metadata": {
+    "title": "Prompt Ops Copilot - הפוך בעיות לפרומפטים מקצועיים",
+    "description": "המר בעיות פיתוח לפרומפטים מקצועיים ומובנים"
+  },
+  "common": {
+    "actions": {
+      "save": "שמור",
+      "cancel": "ביטול",
+      "delete": "מחק",
+      "edit": "ערוך",
+      "copy": "העתק",
+      "copied": "הועתק!",
+      "generate": "צור",
+      "regenerate": "צור מחדש",
+      "close": "סגור",
+      "confirm": "אישור",
+      "create": "צור",
+      "add": "הוסף",
+      "remove": "הסר",
+      "search": "חיפוש",
+      "clear": "נקה",
+      "apply": "החל",
+      "reset": "איפוס",
+      "back": "חזור",
+      "next": "הבא",
+      "loading": "טוען...",
+      "selectAll": "בחר הכל",
+      "deselectAll": "בטל בחירה"
+    },
+    "language": {
+      "switchLanguage": "החלף שפה",
+      "en": "English",
+      "he": "עברית"
+    },
+    "status": {
+      "active": "פעיל",
+      "inactive": "לא פעיל",
+      "pending": "ממתין",
+      "success": "הצלחה",
+      "error": "שגיאה"
+    }
+  },
+  "header": {
+    "nav": {
+      "library": "ספריית פרומפטים",
+      "projects": "פרויקטים",
+      "agents": "סוכנים מותאמים",
+      "tags": "תגיות",
+      "tweaks": "התאמות",
+      "settings": "הגדרות"
+    },
+    "auth": {
+      "signIn": "התחבר",
+      "signOut": "התנתק",
+      "getStarted": "התחל עכשיו"
+    }
+  },
+  "landing": {
+    "hero": {
+      "title": "שפר את הפרומפטים שלך",
+      "subtitle": "הפוך בעיות מבולגנות לפרומפטים מובנים ומותאמים לכלי AI",
+      "cta": "התחל ליצור",
+      "secondaryCta": "למד עוד"
+    },
+    "features": {
+      "smartTransformation": {
+        "title": "המרה חכמה",
+        "description": "המרה מונעת AI מרעיונות גולמיים לפרומפטים מובנים"
+      },
+      "hebrewSupport": {
+        "title": "תמיכה בעברית",
+        "description": "כתוב בעברית, קבל פרומפטים מקצועיים באנגלית"
+      },
+      "agentOptimized": {
+        "title": "מותאם לסוכנים",
+        "description": "מותאם ל-Cursor, Lovable, Replit ועוד"
+      }
+    }
+  },
+  "composer": {
+    "input": {
+      "title": "תאר את הבעיה שלך",
+      "placeholder": "תאר את הבעיה, הבקשה לפיצ'ר, או הבאג...\n\nאפשר לכתוב בעברית או באנגלית. הפלט תמיד יהיה באנגלית.",
+      "characterCount": "{count} תווים",
+      "detected": "זוהה"
+    },
+    "output": {
+      "title": "הפרומפט שנוצר",
+      "emptyTitle": "הפרומפט שנוצר יופיע כאן",
+      "emptyDescription": "הזן את הבעיה שלך ולחץ על יצירה",
+      "tabs": {
+        "short": "קצר",
+        "standard": "רגיל",
+        "detailed": "מפורט"
+      },
+      "sections": {
+        "goal": "מטרה",
+        "context": "הקשר",
+        "requirements": "דרישות",
+        "acceptanceCriteria": "קריטריונים לקבלה",
+        "constraints": "מגבלות",
+        "technicalNotes": "הערות טכניות"
+      },
+      "searchTags": "חפש תגיות...",
+      "noMatchingTags": "לא נמצאו תגיות תואמות",
+      "noTagsYet": "אין עדיין תגיות",
+      "tagName": "שם תגית",
+      "createNewTag": "צור תגית חדשה",
+      "creating": "יוצר..."
+    },
+    "options": {
+      "targetAgent": "סוכן יעד",
+      "builtInAgents": "סוכנים מובנים",
+      "customAgents": "סוכנים מותאמים",
+      "project": "פרויקט",
+      "selectProject": "בחר פרויקט",
+      "noProject": "ללא פרויקט",
+      "tags": "תגיות",
+      "selectTags": "בחר תגיות",
+      "noTags": "לא נבחרו תגיות",
+      "tweaks": "התאמות",
+      "selectTweaks": "בחר התאמות",
+      "outputLength": "אורך הפלט",
+      "strategy": "אסטרטגיה",
+      "implement": "מימוש",
+      "diagnose": "אבחון",
+      "questionsMode": "מצב שאלות",
+      "clarifyingQuestions": "כלול שאלות הבהרה",
+      "clarifyingQuestionsTooltip": "כאשר מופעל, הפרומפט שנוצר יכלול 2-4 שאלות הבהרה שיעזרו ל-AI להבין טוב יותר את הצרכים שלך לפני המימוש.",
+      "selectAgent": "בחר סוכן",
+      "manageAgents": "נהל סוכנים",
+      "on": "פעיל",
+      "off": "כבוי"
+    },
+    "actions": {
+      "generate": "צור פרומפט",
+      "generating": "יוצר...",
+      "regenerate": "צור מחדש",
+      "copy": "העתק ללוח",
+      "save": "שמור לספרייה",
+      "saved": "נשמר!",
+      "expand": "הרחב",
+      "collapse": "כווץ",
+      "switchLayout": "החלף סידור"
+    },
+    "welcome": {
+      "title": "חדש בפרויקט זה?",
+      "description": "התחל על ידי שליחת פרומפט הגילוי הזה לעוזר ה-AI שלך. זה יעזור לך להבין את מבנה הקוד ויספק הקשר לפרומפטים טובים יותר.",
+      "showDiscovery": "הצג פרומפט גילוי",
+      "copyDiscoveryPrompt": "העתק פרומפט גילוי",
+      "discoveryPromptCopied": "הועתק! עכשיו הדבק בעוזר ה-AI שלך",
+      "discoveryPromptToast": "פרומפט הגילוי הועתק! הדבק אותו בעוזר ה-AI שלך."
+    },
+    "keyboard": {
+      "pressToGenerate": "לחץ {modifier}+Enter ליצירה"
+    },
+    "projectContext": {
+      "title": "הקשר פרויקט",
+      "active": "פעיל",
+      "description": "הוסף הקשר על הפרויקט שלך ליצירת פרומפטים רלוונטיים יותר. הקשר זה יכלל בכל פרומפט שנוצר.",
+      "manual": "ידני",
+      "form": "טופס",
+      "pasteResponse": "הדבק תשובת AI",
+      "chat": "צ'אט",
+      "projectName": "שם פרויקט",
+      "techStack": "מחסנית טכנולוגית",
+      "codingConventions": "מוסכמות קוד",
+      "applyFormData": "החל נתוני טופס",
+      "clearContext": "נקה הקשר",
+      "createProject": "צור פרויקט",
+      "chatComingSoon": "מצב צ'אט בקרוב",
+      "chatDescription": "נהל שיחה לבניית הקשר",
+      "pasteDescription": "הדבק את התשובה מפרומפט הגילוי לחילוץ אוטומטי של הקשר הפרויקט.",
+      "parseAndApply": "פענח והחל הקשר",
+      "parsing": "מפענח...",
+      "manualPlaceholder": "תאר את הקשר הפרויקט, מחסנית טכנולוגית, מוסכמות ופרטים רלוונטיים אחרים...",
+      "projectNamePlaceholder": "האפליקציה המדהימה שלי",
+      "techStackPlaceholder": "Next.js, TypeScript, Tailwind, Supabase",
+      "descriptionPlaceholder": "תיאור קצר של מה הפרויקט עושה...",
+      "conventionsPlaceholder": "השתמש בקומפוננטות פונקציונליות, העדף הרכבה על פני ירושה...",
+      "pastePlaceholder": "הדבק את התשובה של ה-AI על הפרויקט שלך כאן..."
+    },
+    "promptTweaks": {
+      "title": "התאמות פרומפט",
+      "active": "פעיל",
+      "suggestedCount": "{count} התאמות מומלצות על בסיס הקלט שלך",
+      "view": "צפה",
+      "aiSuggested": "התאמות עם אייקוני ניצוץ מומלצות על ידי AI על בסיס הקלט שלך",
+      "thinkingMode": "מצב חשיבה",
+      "skills": "כישורים",
+      "behaviors": "התנהגויות",
+      "customTweaks": "התאמות מותאמות",
+      "manage": "נהל",
+      "loading": "טוען...",
+      "createFirst": "צור את ההתאמה המותאמת הראשונה שלך",
+      "estimatedTokenImpact": "השפעת טוקנים משוערת:",
+      "tokenCost": "עלות טוקנים:",
+      "conflictsWithSelected": "מתנגש עם התנהגות שנבחרה"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "ברוך שובך",
+      "subtitle": "התחבר לחשבון שלך כדי להמשיך",
+      "email": "אימייל",
+      "emailPlaceholder": "הזן את האימייל שלך",
+      "password": "סיסמה",
+      "passwordPlaceholder": "הזן את הסיסמה שלך",
+      "submit": "התחבר",
+      "googleButton": "המשך עם Google",
+      "noAccount": "אין לך חשבון?",
+      "signUpLink": "הירשם",
+      "forgotPassword": "שכחת סיסמה?",
+      "orContinueWith": "או המשך עם אימייל"
+    },
+    "signup": {
+      "title": "צור חשבון",
+      "subtitle": "התחל להשתמש ב-Prompt Ops Copilot",
+      "email": "אימייל",
+      "emailPlaceholder": "הזן את האימייל שלך",
+      "password": "סיסמה",
+      "passwordPlaceholder": "צור סיסמה",
+      "confirmPassword": "אימות סיסמה",
+      "confirmPasswordPlaceholder": "אמת את הסיסמה שלך",
+      "submit": "הירשם",
+      "googleButton": "הירשם עם Google",
+      "hasAccount": "יש לך כבר חשבון?",
+      "signInLink": "התחבר",
+      "termsText": "בהרשמה אתה מסכים ל",
+      "termsLink": "תנאי השימוש",
+      "privacyLink": "מדיניות הפרטיות",
+      "orContinueWith": "או המשך עם אימייל",
+      "checkEmail": "בדוק את האימייל שלך לאימות החשבון"
+    }
+  },
+  "library": {
+    "title": "ספריית פרומפטים",
+    "subtitle": "עיין ונהל את הפרומפטים השמורים שלך",
+    "filters": {
+      "search": "חפש פרומפטים...",
+      "agent": "סוכן",
+      "allAgents": "כל הסוכנים",
+      "project": "פרויקט",
+      "allProjects": "כל הפרויקטים",
+      "dateRange": "טווח תאריכים",
+      "tags": "תגיות",
+      "allTags": "כל התגיות"
+    },
+    "sort": {
+      "label": "מיין לפי",
+      "newest": "החדש ביותר",
+      "oldest": "הישן ביותר",
+      "alphabetical": "אלפביתי"
+    },
+    "empty": {
+      "title": "אין עדיין פרומפטים",
+      "description": "צור את הפרומפט הראשון שלך כדי לראות אותו כאן",
+      "cta": "צור פרומפט"
+    },
+    "card": {
+      "viewDetails": "צפה בפרטים",
+      "copyPrompt": "העתק פרומפט",
+      "delete": "מחק",
+      "createdAt": "נוצר ב-{date}",
+      "usedWith": "שימוש עם {agent}"
+    },
+    "bulkActions": {
+      "selected": "{count} נבחרו",
+      "delete": "מחק נבחרים",
+      "addTags": "הוסף תגיות",
+      "removeTags": "הסר תגיות",
+      "confirmDelete": "האם אתה בטוח שברצונך למחוק {count} פרומפטים?"
+    }
+  },
+  "projects": {
+    "title": "פרויקטים",
+    "subtitle": "ארגן את הפרומפטים שלך לפי פרויקט",
+    "create": "פרויקט חדש",
+    "edit": "ערוך פרויקט",
+    "delete": "מחק פרויקט",
+    "form": {
+      "name": "שם הפרויקט",
+      "namePlaceholder": "הזן שם פרויקט",
+      "description": "תיאור",
+      "descriptionPlaceholder": "תאר את הפרויקט שלך",
+      "contextPack": "חבילת הקשר",
+      "contextPackPlaceholder": "הוסף הקשר שיכלל עם הפרומפטים",
+      "contextPackHelp": "הקשר זה יכלל אוטומטית ביצירת פרומפטים לפרויקט זה"
+    },
+    "empty": {
+      "title": "אין עדיין פרויקטים",
+      "description": "צור את הפרויקט הראשון שלך לארגון הפרומפטים",
+      "cta": "צור פרויקט"
+    },
+    "card": {
+      "promptCount": "{count} פרומפטים",
+      "lastUpdated": "עודכן לאחרונה ב-{date}",
+      "viewProject": "צפה בפרויקט"
+    },
+    "confirmDelete": "האם אתה בטוח שברצונך למחוק פרויקט זה? כל הפרומפטים המשויכים ינותקו."
+  },
+  "agents": {
+    "title": "סוכנים מותאמים",
+    "subtitle": "צור פרופילי סוכן מותאמים ליצירת פרומפטים מיוחדת",
+    "create": "סוכן חדש",
+    "edit": "ערוך סוכן",
+    "delete": "מחק סוכן",
+    "form": {
+      "name": "שם הסוכן",
+      "namePlaceholder": "הזן שם סוכן",
+      "description": "תיאור",
+      "descriptionPlaceholder": "תאר במה הסוכן מתמחה",
+      "systemPrompt": "פרומפט מערכת",
+      "systemPromptPlaceholder": "הגדר את התנהגות הסוכן וההנחיות",
+      "icon": "אייקון",
+      "color": "צבע"
+    },
+    "empty": {
+      "title": "אין עדיין סוכנים מותאמים",
+      "description": "צור את הסוכן המותאם הראשון שלך להתאמת יצירת הפרומפטים",
+      "cta": "צור סוכן"
+    },
+    "confirmDelete": "האם אתה בטוח שברצונך למחוק סוכן זה?"
+  },
+  "tags": {
+    "title": "תגיות",
+    "subtitle": "נהל תגיות לארגון הפרומפטים שלך",
+    "create": "תגית חדשה",
+    "edit": "ערוך תגית",
+    "delete": "מחק תגית",
+    "form": {
+      "name": "שם התגית",
+      "namePlaceholder": "הזן שם תגית",
+      "color": "צבע",
+      "selectColor": "בחר צבע"
+    },
+    "empty": {
+      "title": "אין עדיין תגיות",
+      "description": "צור תגיות לסיווג הפרומפטים שלך",
+      "cta": "צור תגית"
+    },
+    "confirmDelete": "האם אתה בטוח שברצונך למחוק תגית זו?",
+    "bulkActions": {
+      "selected": "{count} נבחרו",
+      "delete": "מחק נבחרים",
+      "confirmDelete": "האם אתה בטוח שברצונך למחוק {count} תגיות?"
+    }
+  },
+  "tweaks": {
+    "title": "התאמות",
+    "subtitle": "צור שינויי פרומפט לשימוש חוזר",
+    "create": "התאמה חדשה",
+    "edit": "ערוך התאמה",
+    "delete": "מחק התאמה",
+    "form": {
+      "name": "שם ההתאמה",
+      "namePlaceholder": "הזן שם התאמה",
+      "description": "תיאור",
+      "descriptionPlaceholder": "תאר מה ההתאמה עושה",
+      "content": "תוכן ההתאמה",
+      "contentPlaceholder": "הזן את התוכן שיתווסף לפרומפטים"
+    },
+    "empty": {
+      "title": "אין עדיין התאמות",
+      "description": "צור התאמות להתאמה אישית של יצירת הפרומפטים",
+      "cta": "צור התאמה"
+    },
+    "confirmDelete": "האם אתה בטוח שברצונך למחוק התאמה זו?"
+  },
+  "settings": {
+    "title": "הגדרות",
+    "subtitle": "נהל את החשבון וההעדפות שלך",
+    "sections": {
+      "provider": "ספק AI",
+      "appearance": "מראה",
+      "language": "שפה",
+      "account": "חשבון",
+      "danger": "אזור מסוכן"
+    },
+    "provider": {
+      "title": "ספק AI",
+      "description": "הגדר את ספק ה-AI המועדף עליך",
+      "select": "בחר ספק",
+      "apiKey": "מפתח API",
+      "apiKeyPlaceholder": "הזן את מפתח ה-API שלך",
+      "apiKeyHelp": "מפתח ה-API שלך מאוחסן בצורה מאובטחת ואינו משותף",
+      "model": "מודל",
+      "selectModel": "בחר מודל",
+      "testConnection": "בדוק חיבור",
+      "connectionSuccess": "החיבור הצליח!",
+      "connectionError": "החיבור נכשל. בדוק את מפתח ה-API שלך."
+    },
+    "appearance": {
+      "title": "מראה",
+      "description": "התאם את המראה והתחושה",
+      "theme": "ערכת נושא",
+      "themeLight": "בהיר",
+      "themeDark": "כהה",
+      "themeSystem": "מערכת"
+    },
+    "language": {
+      "title": "שפה",
+      "description": "בחר את השפה המועדפת עליך",
+      "select": "בחר שפה"
+    },
+    "account": {
+      "title": "חשבון",
+      "description": "נהל את הגדרות החשבון שלך",
+      "email": "אימייל",
+      "changePassword": "שנה סיסמה",
+      "deleteAccount": "מחק חשבון"
+    },
+    "danger": {
+      "title": "אזור מסוכן",
+      "description": "פעולות בלתי הפיכות והרסניות",
+      "deleteAccount": "מחק חשבון",
+      "deleteAccountWarning": "פעולה זו תמחק לצמיתות את החשבון שלך ואת כל הנתונים המשויכים.",
+      "confirmDelete": "הקלד DELETE לאישור"
+    }
+  },
+  "validation": {
+    "required": "שדה {field} הוא חובה",
+    "email": "נא להזין אימייל תקין",
+    "minLength": "{field} חייב להכיל לפחות {min} תווים",
+    "maxLength": "{field} חייב להכיל לכל היותר {max} תווים",
+    "passwordMatch": "הסיסמאות אינן תואמות",
+    "invalidApiKey": "פורמט מפתח API לא תקין"
+  },
+  "toast": {
+    "success": {
+      "saved": "נשמר בהצלחה",
+      "copied": "הועתק ללוח",
+      "deleted": "נמחק בהצלחה",
+      "created": "נוצר בהצלחה",
+      "updated": "עודכן בהצלחה",
+      "generated": "הפרומפט נוצר בהצלחה"
+    },
+    "error": {
+      "generic": "משהו השתבש",
+      "saveFailed": "השמירה נכשלה",
+      "loadFailed": "טעינת הנתונים נכשלה",
+      "deleteFailed": "המחיקה נכשלה",
+      "generateFailed": "יצירת הפרומפט נכשלה",
+      "copyFailed": "ההעתקה ללוח נכשלה",
+      "networkError": "שגיאת רשת. בדוק את החיבור שלך.",
+      "unauthorized": "נא להתחבר כדי להמשיך"
+    }
+  },
+  "aria": {
+    "menu": "תפריט",
+    "navigation": "ניווט ראשי",
+    "userMenu": "תפריט משתמש",
+    "languageMenu": "בחירת שפה",
+    "themeToggle": "החלף ערכת נושא",
+    "closeDialog": "סגור חלון",
+    "expandSection": "הרחב קטע",
+    "collapseSection": "כווץ קטע"
+  }
+}

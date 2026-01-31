@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
-import { Plus, Bot, Search, LayoutGrid, List } from 'lucide-react';
+import { Plus, Sparkles, Search, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Input } from '@/components/ui/input';
 import { Toggle } from '@/components/ui/toggle';
-import { AgentCard } from '@/components/agents/agent-card';
-import { AgentFormDialog } from '@/components/agents/agent-form-dialog';
+import { TweakCard } from '@/components/tweaks/tweak-card';
+import { TweakFormDialog } from '@/components/tweaks/tweak-form-dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,73 +19,73 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { CustomAgent } from '@prompt-ops/shared';
+import type { CustomTweak } from '@prompt-ops/shared';
 
 type ViewMode = 'grid' | 'list';
 
-export default function AgentsPage() {
-  const [agents, setAgents] = React.useState<CustomAgent[]>([]);
+export default function TweaksPage() {
+  const [tweaks, setTweaks] = React.useState<CustomTweak[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [search, setSearch] = React.useState('');
   const [viewMode, setViewMode] = React.useState<ViewMode>('grid');
   const [showDialog, setShowDialog] = React.useState(false);
-  const [editAgent, setEditAgent] = React.useState<CustomAgent | null>(null);
+  const [editTweak, setEditTweak] = React.useState<CustomTweak | null>(null);
   const [deleteId, setDeleteId] = React.useState<string | null>(null);
 
-  const fetchAgents = React.useCallback(async () => {
+  const fetchTweaks = React.useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (search) params.set('search', search);
 
-      const response = await fetch(`/api/agents?${params}`);
-      if (!response.ok) throw new Error('Failed to fetch agents');
+      const response = await fetch(`/api/tweaks?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch tweaks');
 
       const data = await response.json();
-      setAgents(data.agents || []);
+      setTweaks(data.tweaks || []);
     } catch {
-      toast.error('Failed to load custom agents');
+      toast.error('Failed to load custom tweaks');
     } finally {
       setIsLoading(false);
     }
   }, [search]);
 
   React.useEffect(() => {
-    fetchAgents();
-  }, [fetchAgents]);
+    fetchTweaks();
+  }, [fetchTweaks]);
 
   const handleDelete = async () => {
     if (!deleteId) return;
 
     try {
-      const response = await fetch(`/api/agents/${deleteId}`, {
+      const response = await fetch(`/api/tweaks/${deleteId}`, {
         method: 'DELETE',
       });
 
       if (!response.ok) throw new Error('Failed to delete');
 
-      setAgents((prev) => prev.filter((a) => a.id !== deleteId));
-      toast.success('Agent deleted');
+      setTweaks((prev) => prev.filter((t) => t.id !== deleteId));
+      toast.success('Tweak deleted');
     } catch {
-      toast.error('Failed to delete agent');
+      toast.error('Failed to delete tweak');
     } finally {
       setDeleteId(null);
     }
   };
 
-  const handleSuccess = (agent: CustomAgent) => {
-    if (editAgent) {
-      setAgents((prev) =>
-        prev.map((a) => (a.id === agent.id ? agent : a))
+  const handleSuccess = (tweak: CustomTweak) => {
+    if (editTweak) {
+      setTweaks((prev) =>
+        prev.map((t) => (t.id === tweak.id ? tweak : t))
       );
     } else {
-      setAgents((prev) => [agent, ...prev]);
+      setTweaks((prev) => [tweak, ...prev]);
     }
-    setEditAgent(null);
+    setEditTweak(null);
   };
 
-  const handleEdit = (agent: CustomAgent) => {
-    setEditAgent(agent);
+  const handleEdit = (tweak: CustomTweak) => {
+    setEditTweak(tweak);
     setShowDialog(true);
   };
 
@@ -93,26 +93,26 @@ export default function AgentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Custom Agents</h1>
+          <h1 className="text-2xl font-bold">Custom Tweaks</h1>
           <p className="text-muted-foreground">
-            {agents.length} agent{agents.length !== 1 ? 's' : ''}
+            {tweaks.length} tweak{tweaks.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button onClick={() => { setEditAgent(null); setShowDialog(true); }}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Agent
+        <Button onClick={() => { setEditTweak(null); setShowDialog(true); }}>
+          <Plus className="h-4 w-4 me-2" />
+          New Tweak
         </Button>
       </div>
 
       {/* Search and View Mode */}
       <div className="flex items-center gap-4">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search agents..."
+            placeholder="Search tweaks..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
+            className="ps-9"
           />
         </div>
         <div className="flex items-center gap-1 border rounded-md p-1">
@@ -139,16 +139,16 @@ export default function AgentsPage() {
         <div className="flex items-center justify-center py-12">
           <Spinner size="lg" variant="muted" />
         </div>
-      ) : agents.length === 0 ? (
+      ) : tweaks.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Bot className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">No custom agents yet</h3>
+          <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium">No custom tweaks yet</h3>
           <p className="text-muted-foreground mt-1">
-            Create a custom agent to personalize your prompt generation.
+            Create custom tweaks to add your own modifiers to prompt generation.
           </p>
-          <Button className="mt-4" onClick={() => { setEditAgent(null); setShowDialog(true); }}>
-            <Plus className="h-4 w-4 mr-2" />
-            Create your first agent
+          <Button className="mt-4" onClick={() => { setEditTweak(null); setShowDialog(true); }}>
+            <Plus className="h-4 w-4 me-2" />
+            Create your first tweak
           </Button>
         </div>
       ) : (
@@ -159,22 +159,22 @@ export default function AgentsPage() {
               : 'flex flex-col gap-4'
           }
         >
-          {agents.map((agent) => (
-            <AgentCard
-              key={agent.id}
-              agent={agent}
-              onEdit={() => handleEdit(agent)}
-              onDelete={() => setDeleteId(agent.id)}
+          {tweaks.map((tweak) => (
+            <TweakCard
+              key={tweak.id}
+              tweak={tweak}
+              onEdit={() => handleEdit(tweak)}
+              onDelete={() => setDeleteId(tweak.id)}
             />
           ))}
         </div>
       )}
 
-      {/* Agent Form Dialog */}
-      <AgentFormDialog
+      {/* Tweak Form Dialog */}
+      <TweakFormDialog
         open={showDialog}
         onOpenChange={setShowDialog}
-        agent={editAgent}
+        tweak={editTweak}
         onSuccess={handleSuccess}
       />
 
@@ -182,9 +182,9 @@ export default function AgentsPage() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Agent</AlertDialogTitle>
+            <AlertDialogTitle>Delete Tweak</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this custom agent? This action cannot be undone.
+              Are you sure you want to delete this custom tweak? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

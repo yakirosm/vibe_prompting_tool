@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ChevronDown,
   ChevronUp,
@@ -62,6 +63,10 @@ export function ProjectContextPanel({
   isAuthenticated = false,
   onProjectCreated,
 }: ProjectContextPanelProps) {
+  const t = useTranslations('composer.projectContext');
+  const tProjects = useTranslations('projects.form');
+  const tToast = useTranslations('toast');
+
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [activeMethod, setActiveMethod] = React.useState<InputMethod>('manual');
   const [formData, setFormData] = React.useState<FormData>({
@@ -202,15 +207,15 @@ export function ProjectContextPanel({
       }
     }
 
-    toast.success(`Project "${project.name}" created and context applied!`);
+    toast.success(tToast('success.created'));
     onProjectCreated?.(project);
-  }, [onContextChange, onProjectCreated]);
+  }, [onContextChange, onProjectCreated, tToast]);
 
   const inputMethods = [
-    { id: 'manual' as const, label: 'Manual', icon: FileText },
-    { id: 'form' as const, label: 'Form', icon: FormInput },
-    { id: 'paste' as const, label: 'Paste AI Response', icon: ClipboardPaste },
-    { id: 'chat' as const, label: 'Chat', icon: MessageSquare, disabled: true },
+    { id: 'manual' as const, label: t('manual'), icon: FileText },
+    { id: 'form' as const, label: t('form'), icon: FormInput },
+    { id: 'paste' as const, label: t('pasteResponse'), icon: ClipboardPaste },
+    { id: 'chat' as const, label: t('chat'), icon: MessageSquare, disabled: true },
   ];
 
   return (
@@ -225,10 +230,10 @@ export function ProjectContextPanel({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-primary" />
-            <CardTitle className="text-sm font-medium">Project Context</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('title')}</CardTitle>
             {hasContext && (
               <Badge variant="secondary" className="text-xs">
-                Active
+                {t('active')}
               </Badge>
             )}
           </div>
@@ -252,7 +257,7 @@ export function ProjectContextPanel({
       {isExpanded && (
         <CardContent className="pt-0 pb-4 px-4 animate-slide-down">
           <p className="text-xs text-muted-foreground mb-4">
-            Add context about your project to generate more relevant prompts. This context will be included in every generated prompt.
+            {t('description')}
           </p>
 
           <Tabs value={activeMethod} onValueChange={(v) => setActiveMethod(v as InputMethod)}>
@@ -275,7 +280,7 @@ export function ProjectContextPanel({
               <Textarea
                 value={context}
                 onChange={(e) => onContextChange(e.target.value)}
-                placeholder="Describe your project context, tech stack, conventions, and any other relevant details..."
+                placeholder={t('manualPlaceholder')}
                 className="min-h-[120px] text-sm"
                 disabled={disabled}
               />
@@ -285,45 +290,45 @@ export function ProjectContextPanel({
             <TabsContent value="form" className="space-y-3">
               <div className="grid gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="project-name" className="text-xs">Project Name</Label>
+                  <Label htmlFor="project-name" className="text-xs">{t('projectName')}</Label>
                   <Input
                     id="project-name"
                     value={formData.projectName}
                     onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
-                    placeholder="My Awesome App"
+                    placeholder={t('projectNamePlaceholder')}
                     className="h-8 text-sm"
                     disabled={disabled}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="tech-stack" className="text-xs">Tech Stack</Label>
+                  <Label htmlFor="tech-stack" className="text-xs">{t('techStack')}</Label>
                   <Input
                     id="tech-stack"
                     value={formData.techStack}
                     onChange={(e) => setFormData({ ...formData, techStack: e.target.value })}
-                    placeholder="Next.js, TypeScript, Tailwind, Supabase"
+                    placeholder={t('techStackPlaceholder')}
                     className="h-8 text-sm"
                     disabled={disabled}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-xs">Description</Label>
+                  <Label htmlFor="description" className="text-xs">{tProjects('description')}</Label>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Brief description of what the project does..."
+                    placeholder={t('descriptionPlaceholder')}
                     className="min-h-[60px] text-sm"
                     disabled={disabled}
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="conventions" className="text-xs">Coding Conventions</Label>
+                  <Label htmlFor="conventions" className="text-xs">{t('codingConventions')}</Label>
                   <Input
                     id="conventions"
                     value={formData.conventions}
                     onChange={(e) => setFormData({ ...formData, conventions: e.target.value })}
-                    placeholder="Use functional components, prefer composition over inheritance..."
+                    placeholder={t('conventionsPlaceholder')}
                     className="h-8 text-sm"
                     disabled={disabled}
                   />
@@ -335,20 +340,20 @@ export function ProjectContextPanel({
                 disabled={disabled || !Object.values(formData).some(v => v.trim())}
                 className="w-full"
               >
-                <Check className="h-3 w-3 mr-1" />
-                Apply Form Data
+                <Check className="h-3 w-3 me-1" />
+                {t('applyFormData')}
               </Button>
             </TabsContent>
 
             {/* Paste AI Response */}
             <TabsContent value="paste" className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                Paste the response from the discovery prompt to automatically extract project context.
+                {t('pasteDescription')}
               </p>
               <Textarea
                 value={pastedResponse}
                 onChange={(e) => setPastedResponse(e.target.value)}
-                placeholder="Paste the AI's response about your project here..."
+                placeholder={t('pastePlaceholder')}
                 className="min-h-[120px] text-sm font-mono"
                 disabled={disabled}
               />
@@ -359,11 +364,11 @@ export function ProjectContextPanel({
                 className="w-full"
               >
                 {isParsing ? (
-                  <>Parsing...</>
+                  <>{t('parsing')}</>
                 ) : (
                   <>
-                    <ClipboardPaste className="h-3 w-3 mr-1" />
-                    Parse & Apply Context
+                    <ClipboardPaste className="h-3 w-3 me-1" />
+                    {t('parseAndApply')}
                   </>
                 )}
               </Button>
@@ -374,8 +379,8 @@ export function ProjectContextPanel({
               <div className="flex items-center justify-center h-32 text-muted-foreground">
                 <div className="text-center">
                   <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">Chat mode coming soon</p>
-                  <p className="text-xs">Have a conversation to build context</p>
+                  <p className="text-sm">{t('chatComingSoon')}</p>
+                  <p className="text-xs">{t('chatDescription')}</p>
                 </div>
               </div>
             </TabsContent>
@@ -391,8 +396,8 @@ export function ProjectContextPanel({
                   onClick={handleClearContext}
                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
-                  <X className="h-3 w-3 mr-1" />
-                  Clear Context
+                  <X className="h-3 w-3 me-1" />
+                  {t('clearContext')}
                 </Button>
               )}
             </div>
@@ -407,7 +412,7 @@ export function ProjectContextPanel({
                   className="gap-1.5"
                 >
                   <FolderPlus className="h-3.5 w-3.5" />
-                  Create Project
+                  {t('createProject')}
                 </Button>
               ) : (
                 <Link href="/app/projects">
@@ -417,7 +422,7 @@ export function ProjectContextPanel({
                     className="gap-1.5"
                   >
                     <FolderPlus className="h-3.5 w-3.5" />
-                    Create Project
+                    {t('createProject')}
                   </Button>
                 </Link>
               )}

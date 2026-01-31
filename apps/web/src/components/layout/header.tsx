@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Settings, Moon, Sun, Sparkles, LogOut, User, Library, FolderKanban, Bot, Tag, Wand2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
@@ -26,6 +25,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { createClient } from '@/lib/supabase/client';
+import { Link, usePathname, useRouter } from '@/i18n/navigation';
+import { LanguageSwitcher } from './language-switcher';
 
 interface HeaderProps {
   isAuthenticated?: boolean;
@@ -35,6 +36,7 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const t = useTranslations();
   const isAppRoute = pathname?.startsWith('/app');
 
   const handleSignOut = async () => {
@@ -46,7 +48,7 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
-        <div className="flex items-center gap-2 mr-4">
+        <div className="flex items-center gap-2 me-4">
           <Link href={isAuthenticated ? '/app' : '/'} className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <Sparkles className="h-4 w-4 text-primary-foreground" />
@@ -77,7 +79,7 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="flex items-center gap-2 ms-auto">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -85,81 +87,83 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
                   variant="ghost"
                   size="icon"
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  aria-label="Toggle theme"
+                  aria-label={t('aria.themeToggle')}
                 >
                   <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                   <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Toggle theme</p>
+                <p>{t('aria.themeToggle')}</p>
               </TooltipContent>
             </Tooltip>
+
+            <LanguageSwitcher />
 
             {isAppRoute && (
               <>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild>
-                      <Link href="/app/library" aria-label="Prompt Library">
+                      <Link href="/app/library" aria-label={t('header.nav.library')}>
                         <Library className="h-4 w-4" />
                       </Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Prompt Library</p>
+                    <p>{t('header.nav.library')}</p>
                   </TooltipContent>
                 </Tooltip>
 
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild>
-                      <Link href="/app/projects" aria-label="Projects">
+                      <Link href="/app/projects" aria-label={t('header.nav.projects')}>
                         <FolderKanban className="h-4 w-4" />
                       </Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Projects</p>
+                    <p>{t('header.nav.projects')}</p>
                   </TooltipContent>
                 </Tooltip>
 
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild>
-                      <Link href="/app/agents" aria-label="Custom Agents">
+                      <Link href="/app/agents" aria-label={t('header.nav.agents')}>
                         <Bot className="h-4 w-4" />
                       </Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Custom Agents</p>
+                    <p>{t('header.nav.agents')}</p>
                   </TooltipContent>
                 </Tooltip>
 
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild>
-                      <Link href="/app/tags" aria-label="Tags">
+                      <Link href="/app/tags" aria-label={t('header.nav.tags')}>
                         <Tag className="h-4 w-4" />
                       </Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Tags</p>
+                    <p>{t('header.nav.tags')}</p>
                   </TooltipContent>
                 </Tooltip>
 
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild>
-                      <Link href="/app/tweaks" aria-label="Custom Tweaks">
+                      <Link href="/app/tweaks" aria-label={t('header.nav.tweaks')}>
                         <Wand2 className="h-4 w-4" />
                       </Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Custom Tweaks</p>
+                    <p>{t('header.nav.tweaks')}</p>
                   </TooltipContent>
                 </Tooltip>
               </>
@@ -169,21 +173,21 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
           {isAuthenticated && isAppRoute && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Account menu">
+                <Button variant="ghost" size="icon" aria-label={t('aria.userMenu')}>
                   <User className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <Link href="/app/settings" className="flex items-center">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
+                    <Settings className="h-4 w-4 me-2" />
+                    {t('header.nav.settings')}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sign Out
+                  <LogOut className="h-4 w-4 me-2" />
+                  {t('header.auth.signOut')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -192,10 +196,10 @@ export function Header({ isAuthenticated = false }: HeaderProps) {
           {!isAuthenticated && !isAppRoute && (
             <div className="flex items-center gap-2">
               <Button variant="ghost" asChild>
-                <Link href="/login">Log in</Link>
+                <Link href="/login">{t('header.auth.signIn')}</Link>
               </Button>
               <Button asChild>
-                <Link href="/signup">Get Started</Link>
+                <Link href="/signup">{t('header.auth.getStarted')}</Link>
               </Button>
             </div>
           )}
